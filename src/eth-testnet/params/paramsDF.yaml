@@ -1,0 +1,36 @@
+participants:
+  - el_type: geth
+    el_image: "ethereum/client-go:latest"
+    cl_type: lighthouse
+    cl_image: "ethpandaops/lighthouse:unstable"
+    vc_type: lighthouse
+    vc_image: "sigp/lighthouse:latest"
+    count: 3
+network_params:  # Network parameters (genesis, forks, timing, blob params, ...)
+  network: kurtosis  # Network name (profile), e.g. used with Kurtosis
+  network_id: "3151908"  # Chain ID/Network ID for EL
+  deposit_contract_address: "0x00000000219ab540356cBB839Cbe05303d7705Fa"  # Deposit contract address (Eth2)
+  seconds_per_slot: 12  # Number of seconds per slot in CL
+  slot_duration_ms: 12000  # Slot duration in milliseconds (must match seconds_per_slot)
+  num_validator_keys_per_node: 128 # Number of pre-generated validator keys per node
+  genesis_delay: 20  # Delay (in seconds) before creating genesis after startup
+  genesis_gaslimit: 60000000  # Genesis block gas limit (EL)
+  max_per_epoch_activation_churn_limit: 64  # Maximum number of validators activated per epoch (absolute cap)
+  churn_limit_quotient: 65536  # Quotient to compute dynamic churn limit from total active validators
+  eth1_follow_distance: 64  # Eth1 follow distance for the deposit contract (slots/blocks)
+  min_validator_withdrawability_delay: 1  # Minimum number of epochs before a validator can withdraw
+  withdrawal_type: "0x02"  # Withdrawal credential type (0x00 = BLS, 0x01 = ETH1 address)
+  withdrawal_address: "0x8943545177806ED17B9F23F0a21ee5948eCaa776"  # Withdrawal address (if withdrawal type supports it)
+  validator_balance: 36  # Initial ETH balance per validator (in ETH units)
+  min_epochs_for_data_column_sidecars_requests: 4096  # Minimum number of epochs for data column sidecar requests
+additional_services:
+  - dora
+  # - prometheus
+  # - grafana
+  - spamoor
+dora_params:
+  # Dora docker image to use
+  # Defaults to the latest image
+  image: "ethpandaops/dora:latest"
+  # A list of optional extra env_vars the dora container should spin up with
+  env: {}
