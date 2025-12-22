@@ -55,11 +55,11 @@ if (process.env.MONGODB_URI) {
 
   mongoose
     .connect(mongoUri, mongoOptions)
-    .then(() => console.log("✅ Connected to MongoDB"))
-    .catch((err) => console.error("❌ MongoDB connection error:", err));
+    .then(() => console.log("Connected to MongoDB"))
+    .catch((err) => console.error("MongoDB connection error:", err));
 } else {
   console.log(
-    "⚠️  MongoDB not configured - running without database (simulation only mode)"
+    "MongoDB not configured - running without database (simulation only mode)"
   );
 }
 
@@ -95,8 +95,8 @@ app.use("*", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📊 PoS Simulator Backend ready`);
+  console.log(`Server running on port ${PORT}`);
+  console.log(`PoS Simulator Backend ready`);
 });
 
 module.exports = app;

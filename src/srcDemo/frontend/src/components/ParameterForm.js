@@ -45,12 +45,16 @@ const ParameterForm = ({
       value: "OPPOSITE_WEIGHTED",
       label: "Opposite Weighted (Inverse weighting)",
     },
-    { value: "LOG_WEIGHTED", label: "Log Weighted (Logarithmic weighting)" },
-    { value: "DESW", label: "DESW (Dynamic Exponential Stake Weighting)" },
     {
-      value: "SRSW_WEIGHTED",
-      label: "SRSW Weighted (Square Root Stake Weighting)",
+      value: "SRSW",
+      label: "SRSW (Square Root Stake Weighting)",
     },
+    {
+      value: "LSW",
+      label: "LSW (Logarithmic Stake Weighting)",
+    },
+    { value: "DESW", label: "DESW (Dynamic Exponential Stake Weighting)" },
+
     { value: "RANDOM", label: "Random (Random selection)" },
   ];
 

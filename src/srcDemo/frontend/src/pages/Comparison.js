@@ -29,8 +29,13 @@ const Comparison = () => {
       color: "#ef4444",
     },
     {
-      value: "LOG_WEIGHTED",
-      label: "Log Weighted (Logarithmic weighting)",
+      value: "SRSW",
+      label: "SRSW (Square Root Stake Weighting)",
+      color: "#06b6d4",
+    },
+    {
+      value: "LSW",
+      label: "LSW (Logarithmic Stake Weighting)",
       color: "#f59e0b",
     },
     {
@@ -38,11 +43,7 @@ const Comparison = () => {
       label: "DESW (Dynamic Exponential Stake Weighting)",
       color: "#8b5cf6",
     },
-    {
-      value: "SRSW_WEIGHTED",
-      label: "SRSW Weighted (Square Root Stake Weighting)",
-      color: "#06b6d4",
-    },
+
     { value: "RANDOM", label: "Random (Random selection)", color: "#f97316" },
   ];
 
@@ -318,15 +319,15 @@ const Comparison = () => {
         {/* Tips */}
         <div className="mt-8 bg-gray-50 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            💡 Comparison ideas
+            Comparison ideas
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
             <div>
               <h4 className="font-semibold mb-2">Popular comparisons:</h4>
               <ul className="space-y-1">
                 <li>• WEIGHTED vs DESW</li>
-                <li>• DESW vs SRSW_WEIGHTED</li>
-                <li>• LOG_WEIGHTED vs OPPOSITE_WEIGHTED</li>
+                <li>• DESW vs SRSW</li>
+                <li>• LSW vs OPPOSITE_WEIGHTED</li>
               </ul>
             </div>
             <div>

@@ -333,21 +333,33 @@ def zipf_coefficient(data: List[float]) -> float:
         return 0.0
 
     # Sort weights in descending order and filter out zeros
-    weights = np.array(sorted(data, reverse=True))
+    weights = np.array(sorted(data, reverse=True), dtype=np.float64)
     weights = weights[weights > 0]  # Filter out zero values
 
     if len(weights) == 0:
         return 0.0
 
     # Rank each validator (1-based rank)
-    ranks = np.arange(1, len(weights) + 1)
+    ranks = np.arange(1, len(weights) + 1, dtype=np.float64)
 
     # Perform log-log transformation
     log_ranks = np.log(ranks)
     log_weights = np.log(weights)
 
-    # Calculate the slope (Z) of the log-log regression
-    slope, _, _, _, _ = linregress(log_ranks, log_weights)
+    # Memory-efficient linear regression slope calculation
+    # Using formula: slope = (n*sum(xy) - sum(x)*sum(y)) / (n*sum(x^2) - sum(x)^2)
+    # This avoids computing the full covariance matrix
+    n = len(log_ranks)
+    sum_x = np.sum(log_ranks)
+    sum_y = np.sum(log_weights)
+    sum_xy = np.sum(log_ranks * log_weights)
+    sum_x2 = np.sum(log_ranks * log_ranks)
+    
+    denominator = n * sum_x2 - sum_x * sum_x
+    if abs(denominator) < 1e-10:  # Avoid division by zero
+        return 0.0
+    
+    slope = (n * sum_xy - sum_x * sum_y) / denominator
 
     # Zipf's Law coefficient is the negative of the slope
     zipf_coefficient = -slope

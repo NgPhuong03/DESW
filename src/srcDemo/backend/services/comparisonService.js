@@ -8,9 +8,9 @@ const VALID_ALGOS = [
   "WEIGHTED",
   "OPPOSITE_WEIGHTED",
   "GINI_STABILIZED",
-  "LOG_WEIGHTED",
+  "LSW",
   "DESW",
-  "SRSW_WEIGHTED",
+  "SRSW",
   "RANDOM",
 ];
 

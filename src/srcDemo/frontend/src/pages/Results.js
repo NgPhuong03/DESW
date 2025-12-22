@@ -426,6 +426,80 @@ const Results = () => {
                 </p>
               </div>
             </div>
+
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-gray-700">
+              <div>
+                <span className="font-medium">Initial stake:</span>{" "}
+                {parameters.initial_stake_volume?.toLocaleString() ?? "N/A"}
+              </div>
+              <div>
+                <span className="font-medium">Initial distribution:</span>{" "}
+                {parameters.initial_distribution ?? "N/A"}
+              </div>
+              {parameters.initial_distribution === "GINI" && (
+                <div>
+                  <span className="font-medium">Initial Gini:</span>{" "}
+                  {parameters.initial_gini != null
+                    ? parameters.initial_gini.toFixed(3)
+                    : "N/A"}
+                </div>
+              )}
+              <div>
+                <span className="font-medium">Corrupted validators:</span>{" "}
+                {parameters.n_corrupted ?? "N/A"}
+              </div>
+              <div>
+                <span className="font-medium">p_fail:</span>{" "}
+                {parameters.p_fail != null ? parameters.p_fail : "N/A"}
+              </div>
+              <div>
+                <span className="font-medium">p_join:</span>{" "}
+                {parameters.p_join != null ? parameters.p_join : "N/A"}
+              </div>
+              <div>
+                <span className="font-medium">p_leave:</span>{" "}
+                {parameters.p_leave != null ? parameters.p_leave : "N/A"}
+              </div>
+              <div>
+                <span className="font-medium">Join amount:</span>{" "}
+                {parameters.join_amount ?? "N/A"}
+              </div>
+              <div>
+                <span className="font-medium">Reward:</span>{" "}
+                {parameters.reward != null ? parameters.reward : "N/A"}
+              </div>
+              <div>
+                <span className="font-medium">Dynamic reward:</span>{" "}
+                {parameters.use_dynamic_reward ? "Yes" : "No"}
+              </div>
+              <div>
+                <span className="font-medium">Penalty %:</span>{" "}
+                {parameters.penalty_percentage != null
+                  ? parameters.penalty_percentage
+                  : "N/A"}
+              </div>
+            </div>
+
+            {Array.isArray(parameters.scheduled_joins) &&
+              parameters.scheduled_joins.length > 0 && (
+                <div className="mt-6">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">
+                    Scheduled joins
+                  </h4>
+                  <div className="space-y-2">
+                    {parameters.scheduled_joins.map((join, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between bg-gray-50 p-3 rounded-lg text-sm text-gray-800"
+                      >
+                        <span>
+                          Epoch {join.epoch}: {join.stake} stake
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
           </div>
         </div>
 

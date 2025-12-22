@@ -23,7 +23,7 @@ const Home = () => {
       icon: Shield,
       title: "Multiple PoS models",
       description:
-        "Study weighted, opposite, DESW, SRSW, log-weighted and more",
+        "Study WEIGHTED, OPPOSITE, DESW, SRSW, LSW and more",
     },
     {
       icon: TrendingUp,
@@ -39,15 +39,15 @@ const Home = () => {
   ];
 
   const algorithms = [
-    { name: "Weighted", description: "Standard stake-weighted selection" },
+    { name: "WEIGHTED", description: "Standard stake-weighted selection" },
     {
-      name: "Opposite Weighted",
+      name: "OPPOSITE_WEIGHTED",
       description: "Inverse weighting to reduce inequality",
     },
     { name: "DESW", description: "Dynamic Exponential Stake Weighting" },
     { name: "SRSW", description: "Square Root Stake Weighting" },
-    { name: "Log Weighted", description: "Logarithmic weighting" },
-    { name: "Random", description: "Random validator selection" },
+    { name: "LSW", description: "Logarithmic Stake Weighting" },
+    { name: "RANDOM", description: "Random validator selection" },
   ];
 
   const metrics = [

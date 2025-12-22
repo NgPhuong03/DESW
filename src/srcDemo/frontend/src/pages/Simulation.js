@@ -132,10 +132,13 @@ const Simulation = () => {
                   • <strong>WEIGHTED:</strong> Baseline model
                 </li>
                 <li>
-                  • <strong>DESW:</strong> Dynamic balancing
+                  • <strong>DESW:</strong> Dynamic Exponential Stake Weighting
                 </li>
                 <li>
-                  • <strong>SRSW_WEIGHTED:</strong> Square-root weighting
+                  • <strong>SRSW:</strong> Square Root Stake Weighting
+                </li>
+                <li>
+                  • <strong>LSW:</strong> Logarithmic Stake Weighting
                 </li>
               </ul>
             </div>

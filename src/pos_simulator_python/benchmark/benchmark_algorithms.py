@@ -400,8 +400,8 @@ def run_benchmark():
     random.seed(42)
     np.random.seed(42)
 
-    # scheduled_joins = [(5000, 10000)]
-    scheduled_joins = []
+    scheduled_joins = [(5000, 10000), (35000, 50000)]
+    # scheduled_joins = []
 
     # name = "exp_1"
     # # Common parameters for all algorithms
@@ -423,45 +423,45 @@ def run_benchmark():
     #     use_dynamic_reward=True,
     # )
 
-    name = "exp_2"
+    # name = "exp_2"
+    # # Common parameters for all algorithms
+    # params = Parameters(
+    #     n_epochs=40000,  # Reduce epochs for faster execution
+    #     initial_stake_volume=50000.0,
+    #     initial_distribution=Distribution.RANDOM,
+    #     initial_gini=0.0,
+    #     n_peers=10000,  # Reduce peers for faster execution
+    #     n_corrupted=200,
+    #     p_fail=0.5,
+    #     p_join=0.01,
+    #     p_leave=0.01,
+    #     join_amount=NewEntry.NEW_RANDOM,
+    #     penalty_percentage=0.5,
+    #     reward=40.0,
+    #     scheduled_joins=None,
+    #     scheduled_sybil_attacks=None,
+    #     use_dynamic_reward=True,
+    # )
+
+    name = "exp_3"
     # Common parameters for all algorithms
     params = Parameters(
         n_epochs=40000,  # Reduce epochs for faster execution
-        initial_stake_volume=50000.0,
+        initial_stake_volume=30000.0,
         initial_distribution=Distribution.RANDOM,
-        initial_gini=0.0,
-        n_peers=10000,  # Reduce peers for faster execution
-        n_corrupted=200,
-        p_fail=0.5,
-        p_join=0.01,
-        p_leave=0.01,
-        join_amount=NewEntry.NEW_RANDOM,
-        penalty_percentage=0.5,
-        reward=40.0,
-        scheduled_joins=None,
+        initial_gini=0.3,
+        n_peers=5000,  # Reduce peers for faster execution
+        n_corrupted=50,
+        p_fail=0.3,
+        p_join=0.001,
+        p_leave=0.001,
+        join_amount=NewEntry.NEW_MAX,
+        penalty_percentage=0.3,
+        reward=20.0,
+        scheduled_joins=scheduled_joins,
         scheduled_sybil_attacks=None,
         use_dynamic_reward=True,
     )
-
-    # name = "exp_3"
-    # # Common parameters for all algorithms
-    # params = Parameters(
-    #     n_epochs=20000,  # Reduce epochs for faster execution
-    #     initial_stake_volume=30000.0,
-    #     initial_distribution=Distribution.RANDOM,
-    #     initial_gini=0.3,
-    #     n_peers=5000,  # Reduce peers for faster execution
-    #     n_corrupted=50,
-    #     p_fail=0.3,
-    #     p_join=0.001,
-    #     p_leave=0.001,
-    #     join_amount=NewEntry.NEW_MAX,
-    #     penalty_percentage=0.3,
-    #     reward=20.0,
-    #     scheduled_joins=None,
-    #     scheduled_sybil_attacks=None,
-    #     use_dynamic_reward=False,
-    # )
 
     # Generate stakes and corrupted peers (use same data for all algorithms)
     stakes_original = generate_peers(

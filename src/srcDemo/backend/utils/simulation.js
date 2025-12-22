@@ -12,9 +12,9 @@ const PoSAlgorithms = {
   WEIGHTED: "WEIGHTED",
   OPPOSITE_WEIGHTED: "OPPOSITE_WEIGHTED",
   GINI_STABILIZED: "GINI_STABILIZED",
-  LOG_WEIGHTED: "LOG_WEIGHTED",
+  LSW: "LSW",
   DESW: "DESW",
-  SRSW_WEIGHTED: "SRSW_WEIGHTED",
+  SRSW: "SRSW",
   RANDOM: "RANDOM",
 };
 
@@ -550,7 +550,7 @@ class SimulationEngine extends EventEmitter {
         return this.weightedConsensus(stakes);
       case PoSAlgorithms.OPPOSITE_WEIGHTED:
         return this.oppositeWeightedConsensus(stakes);
-      case PoSAlgorithms.LOG_WEIGHTED:
+      case PoSAlgorithms.LSW:
         return this.logWeightedConsensus(stakes);
       case PoSAlgorithms.GINI_STABILIZED:
         if (t === null) {
@@ -561,7 +561,7 @@ class SimulationEngine extends EventEmitter {
         return this.giniStabilizedConsensus(stakes, t);
       case PoSAlgorithms.DESW:
         return this.deswConsensus(stakes);
-      case PoSAlgorithms.SRSW_WEIGHTED:
+      case PoSAlgorithms.SRSW:
         return this.srswWeightedConsensus(stakes);
       case PoSAlgorithms.RANDOM:
         return this.randomConsensus(stakes);

@@ -23,6 +23,13 @@ const ComparisonResults = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState("gini_history");
 
+  // Map legacy backend names to new model names
+  const normalizeAlgorithmName = (name) => {
+    if (name === "LOG_WEIGHTED") return "LSW";
+    if (name === "SRSW_WEIGHTED") return "SRSW";
+    return name;
+  };
+
   // Only show the metrics currently used: Gini, HHI, Liveness, Safety, Zipf
   const metricOptions = [
     {
@@ -233,8 +240,12 @@ const ComparisonResults = () => {
     const nakamoto_liveness_pct = toPct(nakamoto_liveness);
     const nakamoto_safety_pct = toPct(nakamoto_safety);
 
+    const normalizedAlgorithm = normalizeAlgorithmName(result.algorithm);
+
     return {
       ...result,
+      algorithm: normalizedAlgorithm,
+      _originalAlgorithm: result.algorithm,
       _metrics: {
         gini,
         hhi,
@@ -255,9 +266,9 @@ const ComparisonResults = () => {
   const algorithmColors = {
     WEIGHTED: "#3b82f6",
     OPPOSITE_WEIGHTED: "#ef4444",
-    LOG_WEIGHTED: "#f59e0b",
+    LSW: "#f59e0b",
     DESW: "#8b5cf6",
-    SRSW_WEIGHTED: "#06b6d4",
+    SRSW: "#06b6d4",
     RANDOM: "#f97316",
   };
 
@@ -338,27 +349,126 @@ const ComparisonResults = () => {
               </div>
             </div>
 
-            {/* Algorithm List */}
-            <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-2">
-                Compared algorithms
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {algorithms_compared.map((algorithm) => (
-                  <span
-                    key={algorithm}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800"
-                  >
-                    <div
-                      className="w-2 h-2 rounded-full mr-2"
-                      style={{
-                        backgroundColor:
-                          algorithmColors[algorithm] || "#6b7280",
-                      }}
-                    />
-                    {algorithm}
-                  </span>
-                ))}
+            <div className="space-y-6 mt-4">
+              <div>
+                <h3 className="text-sm font-medium text-gray-500 mb-2">
+                  Compared algorithms
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {algorithms_compared.map((algorithm) => (
+                    <span
+                      key={algorithm}
+                      className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800"
+                    >
+                      <div
+                        className="w-2 h-2 rounded-full mr-2"
+                        style={{
+                          backgroundColor:
+                            algorithmColors[
+                              normalizeAlgorithmName(algorithm)
+                            ] || "#6b7280",
+                        }}
+                      />
+                      {algorithm}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-medium text-gray-500 mb-2">
+                  Simulation parameters
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm text-gray-700">
+                  <div>
+                    <span className="font-medium">Epochs:</span>{" "}
+                    {base_parameters?.n_epochs?.toLocaleString() ?? "N/A"}
+                  </div>
+                  <div>
+                    <span className="font-medium">Validators:</span>{" "}
+                    {base_parameters?.n_peers ?? "N/A"}
+                  </div>
+                  <div>
+                    <span className="font-medium">Initial stake:</span>{" "}
+                    {base_parameters?.initial_stake_volume?.toLocaleString() ??
+                      "N/A"}
+                  </div>
+                  <div>
+                    <span className="font-medium">Initial distribution:</span>{" "}
+                    {base_parameters?.initial_distribution ?? "N/A"}
+                  </div>
+                  {base_parameters?.initial_distribution === "GINI" && (
+                    <div>
+                      <span className="font-medium">Initial Gini:</span>{" "}
+                      {base_parameters?.initial_gini != null
+                        ? base_parameters.initial_gini.toFixed(3)
+                        : "N/A"}
+                    </div>
+                  )}
+                  <div>
+                    <span className="font-medium">Corrupted validators:</span>{" "}
+                    {base_parameters?.n_corrupted ?? "N/A"}
+                  </div>
+                  <div>
+                    <span className="font-medium">p_fail:</span>{" "}
+                    {base_parameters?.p_fail != null
+                      ? base_parameters.p_fail
+                      : "N/A"}
+                  </div>
+                  <div>
+                    <span className="font-medium">p_join:</span>{" "}
+                    {base_parameters?.p_join != null
+                      ? base_parameters.p_join
+                      : "N/A"}
+                  </div>
+                  <div>
+                    <span className="font-medium">p_leave:</span>{" "}
+                    {base_parameters?.p_leave != null
+                      ? base_parameters.p_leave
+                      : "N/A"}
+                  </div>
+                  <div>
+                    <span className="font-medium">Join amount:</span>{" "}
+                    {base_parameters?.join_amount ?? "N/A"}
+                  </div>
+                  <div>
+                    <span className="font-medium">Reward:</span>{" "}
+                    {base_parameters?.reward != null
+                      ? base_parameters.reward
+                      : "N/A"}
+                  </div>
+                  <div>
+                    <span className="font-medium">Dynamic reward:</span>{" "}
+                    {base_parameters?.use_dynamic_reward ? "Yes" : "No"}
+                  </div>
+                  <div>
+                    <span className="font-medium">Penalty %:</span>{" "}
+                    {base_parameters?.penalty_percentage != null
+                      ? base_parameters.penalty_percentage
+                      : "N/A"}
+                  </div>
+                </div>
+
+                {Array.isArray(base_parameters?.scheduled_joins) &&
+                  base_parameters.scheduled_joins.length > 0 && (
+                    <div className="mt-4">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">
+                        Scheduled joins
+                      </h4>
+                      <div className="space-y-2">
+                        {base_parameters.scheduled_joins.map((join, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center justify-between bg-gray-50 p-3 rounded-lg text-sm text-gray-800"
+                          >
+                            <span>
+                              Epoch {join.epoch}: {join.stake} stake
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
               </div>
             </div>
           </div>

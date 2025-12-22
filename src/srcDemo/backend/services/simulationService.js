@@ -28,9 +28,9 @@ function validateParameters(params = {}) {
       "WEIGHTED",
       "OPPOSITE_WEIGHTED",
       "GINI_STABILIZED",
-      "LOG_WEIGHTED",
+      "LSW",
       "DESW",
-      "SRSW_WEIGHTED",
+      "SRSW",
       "RANDOM",
     ].includes(params.proof_of_stake)
   ) {
@@ -383,7 +383,7 @@ async function listSimulationsBySession(sessionId, { page = 1, limit = 10 }) {
     .skip(skip)
     .limit(parseInt(limit, 10))
     .select(
-      "_id parameters.proof_of_stake status progress execution_time created_at completed_at"
+      "_id parameters.proof_of_stake parameters.n_epochs parameters.n_peers status progress execution_time created_at completed_at"
     );
 
   const total = await Simulation.countDocuments({ sessionId });
