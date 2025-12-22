@@ -1,0 +1,24 @@
+Metric,Value
+Gini Coefficient,0.437509
+Nakamoto Coefficient (50%),10
+Nakamoto Coefficient Liveness (33%),5
+Nakamoto Coefficient Liveness (%),10.00%
+Nakamoto Coefficient Safety (66%),18
+Nakamoto Coefficient Safety (%),36.00%
+HHI,0.038145
+HHI Normalized,0.018515
+Theil Index,0.335459
+Zipf Coefficient,0.831431
+Palma Ratio,2.350828
+Shannon Index,0.914249
+Gamma-Delta (gamma=10%),16.534256
+Gamma-Delta (gamma=25%),10.728856
+Gamma-Delta (gamma=50%),6.056747
+Gamma-Delta (gamma=75%),3.788935
+Gamma-Delta (gamma=90%),1.468153
+Total Validators,50
+Validators with Stake > 0,50
+Total Stake,"56,454,947"
+Mean Stake,"1,129,098.94"
+Max Stake,"5,689,375"
+Min Stake,"204,779"
