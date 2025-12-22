@@ -30,11 +30,15 @@ The codebase includes a comprehensive PoS (Proof-of-Stake) simulation framework,
   - [PoS-Analyzer Web Tool](#pos-analyzer-web-tool)
   - [Ethereum Testnet](#ethereum-testnet)
 - [Configuration](#configuration)
-- [Performance Metrics](#performance-metrics)
+- [Decentralization Metrics](#decentralization-metrics)
 - [Project Structure](#project-structure)
 - [Additional Documentation](#additional-documentation)
 
+<a id="project-overview"></a>
+
 ## Project Overview
+
+<a id="pos-simulator"></a>
 
 ### PoS Simulator
 
@@ -46,6 +50,8 @@ The PoS Simulator (`src/pos_simulator_python/`) provides a flexible Python-based
 - **Benchmarking Tools**: Automated benchmarking and comparison across algorithms with configurable parameters
 - **Visualization**: Generates heatmaps, comparison charts, and performance plots
 
+<a id="real-world-analysis"></a>
+
 ### Real-World Analysis
 
 The Real-World Analysis tool (`src/RealWorld-Analysis/`) enables empirical validation by analyzing live blockchain networks:
@@ -55,6 +61,8 @@ The Real-World Analysis tool (`src/RealWorld-Analysis/`) enables empirical valid
 - **Comparative Analysis**: Generates comparison visualizations across multiple chains and time periods
 - **Data Persistence**: Stores historical validator data and analysis results for trend analysis
 - **Automated Reporting**: Produces CSV reports and visualization charts for research documentation
+
+<a id="pos-analyzer-tools"></a>
 
 ### PoS-Analyzer Tools
 
@@ -66,6 +74,8 @@ The PoS-Analyzer web application (`src/srcDemo/`) provides an interactive interf
 - **Result Visualization**: Interactive charts and graphs for analyzing algorithm performance
 - **Export Capabilities**: Download simulation results and metrics for further analysis
 
+<a id="ethereum-testnet-implementation"></a>
+
 ### Ethereum Testnet Implementation
 
 The Ethereum testnet setup (`src/eth-testnet/`) includes implementations of different PoS variants:
@@ -75,7 +85,11 @@ The Ethereum testnet setup (`src/eth-testnet/`) includes implementations of diff
 - **Network Orchestration**: Docker-based deployment scripts for running multi-node testnets
 - **Parameter Configuration**: YAML-based configuration files for different PoS profiles
 
+<a id="getting-started"></a>
+
 ## 🚀 Getting Started
+
+<a id="prerequisites"></a>
 
 ### Prerequisites
 
@@ -146,6 +160,8 @@ Before setting up the project, ensure you have the following installed:
 
 ## 💻 Usage
 
+<a id="pos-simulator-1"></a>
+
 ### PoS Simulator
 
 #### Running Basic Simulations
@@ -172,6 +188,8 @@ python benchmark_algorithms.py
 ```
 
 This will generate comparison results in `benchmark/results/` directory.
+
+<a id="real-world-analysis-1"></a>
 
 ### Real-World Analysis
 
@@ -218,6 +236,8 @@ BlockchainDecentralizationMetrics.plot_nakamoto_comparison("19122025")
 BlockchainDecentralizationMetrics.plot_hhi_comparison("19122025")
 ```
 
+<a id="pos-analyzer-web-tool"></a>
+
 ### PoS-Analyzer Web Tool
 
 #### Starting the Backend
@@ -246,6 +266,8 @@ The frontend will run on `http://localhost:3000` and automatically open in your 
 4. Configure stake distribution and network parameters
 5. Run simulation and view results
 6. Export results for further analysis
+
+<a id="ethereum-testnet"></a>
 
 ### Ethereum Testnet
 
@@ -339,6 +361,8 @@ Modify testnet parameters in YAML files (`src/eth-testnet/params/`):
 - `paramsSRSW.yaml` - Square-Root-Stake-Weighted parameters
 - `paramsDF.yaml` - Default parameters
 
+<a id="decentralization-metrics"></a>
+
 ## 📈 Decentralization Metrics
 
 The PoS Simulator tracks comprehensive metrics for algorithm comparison:
@@ -347,6 +371,8 @@ The PoS Simulator tracks comprehensive metrics for algorithm comparison:
 - **Nakamoto Coefficient**: Minimum number of entities controlling >33% (liveness) or >66% (safety) of stake
 - **HHI (Herfindahl-Hirschman Index)**: Measures market concentration
 - **Zipf Coefficient**: Characterizes power-law distribution in stake allocation
+
+<a id="project-structure"></a>
 
 ## 🗂️ Project Structure
 
@@ -405,7 +431,7 @@ DESW/
 
 ### Related Projects
 
-- [Original PoS Simulator (Julia)](https://github.com/lorenzorovida/PoS-Simulator) - Original Julia implementation (if applicable)
+- [Original PoS Simulator (Julia)](https://github.com/lorenzorovida/PoS-Simulator) - Original Julia implementation
 
 ---
 
