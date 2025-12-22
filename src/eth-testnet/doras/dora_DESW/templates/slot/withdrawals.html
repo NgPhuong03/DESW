@@ -1,0 +1,49 @@
+{{ define "block_withdrawals" }}
+  <div class="table-ellipsis">
+    <table id="block_withdrawals" class="table table-sm text-left">
+      <thead>
+        <tr>
+          <th class="border-0">Index</th>
+          <th class="border-0">Validator Index</th>
+          <th class="border-0">Recipient Address</th>
+          <th class="border-0">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ range $i, $withdrawal := .Block.Withdrawals }}
+          <tr>
+            <td>{{ $withdrawal.Index }}</td>
+            <td>{{ formatValidatorWithIndex $withdrawal.ValidatorIndex $withdrawal.ValidatorName }}</td>
+            <td>{{ ethAddressLink $withdrawal.Address }}</td>
+            <td>{{ formatEthFromGwei $withdrawal.Amount }}</td>
+          </tr>
+        {{ end }}
+      </tbody>
+    </table>
+  </div>
+{{ end }}
+
+{{ define "block_blsChange" }}
+  <div class="table-ellipsis">
+    <table id="block_blsChange" class="table table-sm text-left">
+      <thead>
+        <tr>
+          <th class="border-0">Validator Index</th>
+          <th class="border-0">Signature</th>
+          <th class="border-0">BLS Public Key</th>
+          <th class="border-0">New Withdrawal Address</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ range $i, $blschange := .Block.BLSChanges }}
+          <tr>
+            <td>{{ formatValidatorWithIndex $blschange.ValidatorIndex $blschange.ValidatorName }}</td>
+            <td>0x{{ printf "%x" $blschange.Signature }}</td>
+            <td>0x{{ printf "%x" $blschange.BlsPubkey }}</td>
+            <td>{{ ethAddressLink $blschange.Address }}</td>
+          </tr>
+        {{ end }}
+      </tbody>
+    </table>
+  </div>
+{{ end }}

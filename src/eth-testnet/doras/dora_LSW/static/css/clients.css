@@ -1,0 +1,218 @@
+/*---------------------------------------------
+Client peers table
+---------------------------------------------*/
+.client-row-divider {
+  margin: 0 auto;
+  padding: 0;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  font-weight: 600;
+  border-bottom: 1px dashed;
+  text-align: center;
+}
+
+.client-row-divider:not(:first-child) {
+  border-top: 1px dashed;
+}
+
+.client-table-info {
+  padding-left: 30px;
+  padding-right: 30px;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.client-node-peerinfo {
+  text-align: left;
+  padding-top: 20px;
+  margin-bottom: 5px;
+  text-wrap: pretty;
+}
+.client-node-enr-infos{
+  text-align: left;
+}
+
+.client-node-peer-details {
+  margin-left: 46px;
+  padding-top:3px;
+  margin-bottom: 10px;
+  border-left: 1px dotted;
+  border-bottom: 1px dotted;
+}
+
+.client-node-peer-details > tr {
+  vertical-align: top;
+}
+
+.client-node-peer-count {
+  width:30px;
+  display: inline-block;
+}
+.client-node-icon {
+  border-radius:50%;
+  border:1px solid #0f0f0f;
+  background-color: #111111;
+  margin-right: 10px;
+  height: 25px;
+  width: 25px;
+}
+.peer-table-icon {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  border: 2px solid #0f0f0f;
+  background-color: #111111;
+  margin-right: 10px;
+}
+
+.peer-table-column{
+  display: inline-block;
+  vertical-align: top;
+  text-align: left;
+  width: 100%;
+}
+
+.peer-table-icon.connected {
+  border-color: #03C03C;
+}
+
+.peerInfo.collapsing {
+  position: relative;
+  height: 0;
+  overflow: hidden;
+  -webkit-transition-property: height, visibility;
+  transition-property: height, visibility;
+  -webkit-transition-duration: 0.35s;
+  transition-duration: 0.35s;
+  -webkit-transition-timing-function: ease;
+  transition-timing-function: ease;
+}
+
+.peer-nodemap {
+  background: #0f0f0f9f url(/images/stars.png) repeat top center;
+  background-blend-mode: multiply;
+  height: 850px;
+  padding: 0;
+}
+
+.peer-nodemap-menu{
+  height: 40px;
+}
+
+@media only screen and (max-width: 768px) {
+  .peer-nodemap {
+    height: 50vh;
+  }
+}
+
+.peer-nodemap-wrapper {
+  padding: 0;
+  background: #4b79a1;
+  background: -webkit-linear-gradient(
+    to top,
+    #283e51,
+    #0a2342
+  );
+  background: linear-gradient(
+    to top,
+    #283e51,
+    #0a2342
+  );
+  background: -olinear-gradient(to top, #283e51, #0a2342);
+}
+
+.peer-text {
+  max-width: 447px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+#nodemap-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1000;
+  width: 100px;
+  height: 100px;
+  margin-left: -50px;
+  margin-top: -50px;
+}
+
+.dastablepeercount {
+  font-weight:300;
+  font-size: 0.6rem;
+  line-height: 0.5rem;
+  margin-bottom: 2px;
+}
+
+.dastablenode {
+  cursor: pointer;
+  max-width: 25px;
+  margin: 0 auto;
+  border: 1px solid #cacaca;
+  -webkit-transition: opacity 0.3s ease;
+  -moz-transition: opacity 0.3s ease;
+  -o-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+  width: 17px;
+  height: 17px;
+
+  border-radius: 0;
+}
+
+.dastablenode.internal {
+  border-color: #ffa500ab
+}
+
+.dastablenode.external {
+  border-color: #075e4d
+}
+
+.dastablenode.supernode {
+  background-color: rgb(0 246 255 / 20%);
+  border-radius: 0;
+}
+
+.dastablenode.supernode.highlight {
+  border-width: 1px !important;
+}
+
+.dastablenode.highlight {
+  opacity: 1 !important;
+  border: 1px solid yellow !important;
+}
+
+.dastablenode.blur {
+  opacity: 0.2;
+}
+
+.peerdetails-modal-peer{
+  cursor: pointer;
+}
+
+.peerdetails-modal-peer:hover{
+  font-weight: 600;
+}
+
+/* ENR text wrapping improvements */
+code.enr-text-container {
+  max-width: calc(100vw - 200px);
+  overflow-wrap: break-word;
+  word-break: break-all;
+  white-space: pre-wrap;
+  hyphens: auto;
+  display: inline-block;
+}
+
+.client-table-info td {
+  max-width: calc(100vw - 250px);
+  overflow-wrap: break-word;
+  word-break: break-all;
+}
+
+/* Modal specific ENR styling */
+.modal-body .client-table-info td {
+  max-width: calc(100vw - 300px);
+}

@@ -1,0 +1,191 @@
+{{ define "networkOverview" }}
+  <div style="position:relative" class="card mt-3 index-stats">
+    <div style="position:absolute; border-bottom-left-radius: 0; border-bottom-right-radius: 0; font-size:.70rem; height:.8rem;" class="progress w-100" data-placement="bottom" title="This epoch is {{ formatFloat .CurrentEpochProgress 0 }}% complete" data-bind="attr: {title: 'This epoch is ' + $root.formatFloat(cur_epoch_prog(), 0) + '% complete'}">
+      <div style="width:{{ formatFloat .CurrentEpochProgress 0 }}%; padding: 0.3rem;" class="progress-bar bg-secondary" role="progressbar" :aria-valuenow="scheduledCount" aria-valuemin="0" aria-valuemax="32" data-bind="attr: {style: 'padding: 0.3rem;'}, style: {width: $root.formatFloat(cur_epoch_prog(), 0)+'%'}">
+        {{- /**/ -}}
+        <span data-bind="text: cur_scheduled() > 0 ? cur_scheduled() + ' / ' + slots_per_epoch() + ' slots left in epoch ' + cur_epoch() : 'epoch ' + cur_epoch() + ' complete'">
+          {{ if gt .CurrentScheduledCount 0 -}}
+            {{ .CurrentScheduledCount }} / 32 slots left in epoch {{ .CurrentEpoch }}
+          {{- else -}}
+            epoch {{ .CurrentEpoch }} complete
+          {{- end }}
+        </span>
+      </div>
+    </div>
+
+    <div class="card-header pt-3">
+      <div class="row">
+        <div class="col-md-4 responsive-border-right responsive-border-right-l">
+          <div class="d-flex justify-content-between">
+            <div class="p-2">
+              <div class="text-secondary mb-0">Epoch</div>
+              <h5 class="font-weight-normal mb-0">
+                <span data-bs-toggle="tooltip" data-bs-placement="top" title="The most recent epoch" data-bind="text: cur_epoch">{{ .CurrentEpoch }}</span> /
+                <span data-bs-toggle="tooltip" data-bs-placement="top" title="The most recent finalized epoch" data-bind="text: finalized_epoch">{{ .CurrentFinalizedEpoch }}</span>
+              </h5>
+            </div>
+            <div class="text-end p-2">
+              <div class="text-secondary mb-0">Current Slot</div>
+              <h5 class="font-weight-normal mb-0">
+                <span data-bs-toggle="tooltip" data-bs-placement="top" title="The most recent slot" data-bind="text: cur_slot">{{ .CurrentSlot }}</span>
+              </h5>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 responsive-border-right responsive-border-right-l">
+          <div class="d-flex justify-content-between">
+            <div class="p-2">
+              <div class="text-secondary mb-0">Active Validators</div>
+              <h5 class="font-weight-normal mb-0">
+                <span data-bs-toggle="tooltip" data-bs-placement="top" title="The number of currently active validators" data-bind="text: active_val">{{ .ActiveValidatorCount }}</span>
+              </h5>
+            </div>
+            <div class="text-end p-2">
+              <div class="text-secondary mb-0">
+                <span data-bs-toggle="tooltip" data-bs-placement="top"
+                  data-bs-original-title="{{ if eq .EnteringValidatorCount 0 }}Currently there are no pending Validators{{ if .EtherChurnPerEpoch }} (churn limit is {{ formatEthAddCommasFromGwei .EtherChurnPerEpoch }} ETH per epoch or {{ formatEthAddCommasFromGwei .EtherChurnPerDay }} ETH per day){{ end }}{{ else }}{{ if .EtherChurnPerEpoch }}It should take at least {{ .NewDepositProcessAfter }} for {{ formatEthAddCommasFromGwei .EnteringEtherAmount }} ETH in pending deposits to be processed (churn limit is {{ formatEthAddCommasFromGwei .EtherChurnPerEpoch }} ETH per epoch or {{ formatEthAddCommasFromGwei .EtherChurnPerDay }} ETH per day){{ else }}Currently there are no pending Validators (churn limit is {{ .ValidatorsPerEpoch }} per epoch or {{ .ValidatorsPerDay }} per day with {{ .ActiveValidatorCount }} validators){{ end }}{{ end }}"
+                  data-bind="attr: {'data-bs-original-title': entering_val() > 0 ? (churn_ether() ? 'It should take at least ' + queue_delay() + ' for ' + $root.formatEth(entering_ether()) + ' ETH in pending deposits to be processed (churn limit is ' + $root.formatEth(churn_ether()) + ' ETH per epoch or ' + $root.formatEth(churn_ether_day()) + ' ETH per day)' : 'Currently there are no pending Validators (churn limit is ' + churn_epoch() + ' per epoch or ' + churn_day() + ' per day with ' + active_val() + ' validators)') : 'Currently there are no pending Validators' + (churn_ether() ? ' (churn limit is ' + $root.formatEth(churn_ether()) + ' ETH per epoch or ' + $root.formatEth(churn_ether_day()) + ' ETH per day)' : '')}">
+                  Pending Validators
+                </span>
+              </div>
+              <h5 class="font-weight-normal mb-0">
+                <span data-bs-toggle="tooltip" data-bs-placement="top" title="The number of validators currently waiting to enter the active validator set" data-bind="text: entering_val()">{{ .EnteringValidatorCount }}</span>
+                / <span data-bs-toggle="tooltip" data-bs-placement="top" title="The number of validators currently waiting to exit the active validator set" data-bind="text: exiting_val()">{{ .ExitingValidatorCount }}</span>
+              </h5>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="d-flex justify-content-between">
+            <div class="p-2">
+              <div class="text-secondary mb-0">Staked Ether</div>
+              <h5 class="font-weight-normal mb-0">
+                <span data-bs-toggle="tooltip" data-bs-placement="top" title="The sum of all effective balances" data-bind="text: $root.formatEth(eligible()) + ' ETH'">{{ formatEthAddCommasFromGwei .TotalEligibleEther }} ETH</span>
+              </h5>
+            </div>
+            <div class="text-end p-2">
+              <div class="text-secondary mb-0">Average Balance</div>
+              <h5 class="font-weight-normal mb-0">
+                <span data-bs-toggle="tooltip" data-bs-placement="top" title="The average current balance of all validators staked" data-bind="text: $root.formatEth(avg_balance()) + ' ETH'">{{ formatEthFromGwei .AverageValidatorBalance }}</span>
+              </h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body px-0 py-1">
+      <div class="row border-bottom p-2 mx-0">
+        <div class="col-md-2"><span data-bs-toggle="tooltip" data-bs-placement="top" title="Name of the Network">Network Name:</span></div>
+        <div class="col-md-10" data-bind="text: netname()">{{ .NetworkName }}</div>
+      </div>
+      <div class="row border-bottom p-2 mx-0">
+        <div class="col-md-2"><span data-bs-toggle="tooltip" data-bs-placement="top" title="Name of the Network">Genesis Time:</span></div>
+        <div class="col-md-10">
+          <div>
+            <span class="genesis-time-hover" aria-ethereum-date="{{ .GenesisTime.Unix }}" aria-ethereum-date-format="FROMNOW" data-bind="attr: {'aria-ethereum-date': $root.unixtime(genesis_time())}, text: $root.timestamp(genesis_time())" data-genesis-timestamp="{{ .GenesisTime.Unix }}">{{ .GenesisTime.UTC }}</span>
+            (<span id="timestamp" aria-ethereum-date="{{ .GenesisTime.Unix }}" aria-ethereum-date-format="LOCAL" data-timer="{{ .GenesisTime.Unix }}" data-bind="attr: {'aria-ethereum-date': $root.unixtime(genesis_time()), 'data-timer': $root.unixtime(genesis_time())}, text: $root.formatRecentTimeShort(genesis_time())">{{ formatRecentTimeShort .GenesisTime }}</span>)
+            <i class="fa fa-copy text-muted p-1" role="button" data-bs-toggle="tooltip" title="Copy to clipboard" data-clipboard-text="{{ .GenesisTime.UTC }}" data-bind="attr: {'data-clipboard-text': $root.timestamp(genesis_time())}"></i>
+          </div>
+        </div>
+      </div>
+      <div class="row border-bottom p-2 mx-0">
+        <div class="col-md-2"><span data-bs-toggle="tooltip" data-bs-placement="top" title="Name of the Network">Genesis Validators Root:</span></div>
+        <div class="col-md-10">
+          <span class="text-monospace" data-bind="text: $root.hexstr(genesis_valroot())">0x{{ printf "%x" .GenesisValidatorsRoot }}</span>
+          <i class="fa fa-copy text-muted p-1" role="button" data-bs-toggle="tooltip" title="Copy to clipboard" data-clipboard-text="0x{{ printf "%x" .GenesisValidatorsRoot }}" data-bind="attr: {'data-clipboard-text': $root.hexstr(genesis_valroot())}"></i>
+        </div>
+      </div>
+      <div class="row border-bottom p-2 mx-0">
+        <div class="col-md-2">
+          <span data-bs-toggle="tooltip" data-bs-placement="top" title="Network Forks">Network Forks:</span>
+        </div>
+        <div class="col-md-10">
+          <div id="forkBadges" class="d-flex justify-content-between align-items-center">
+            <div class="template-tbody">
+              {{ html "<!-- ko foreach: forks -->" }}
+                <span class="template-row badge rounded-pill me-1 border fork-hover" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" data-bind="css: {'text-bg-success': active, 'text-bg-secondary': !active, 'border-warning': type === 'bpo'}, attr: {title: 'Epoch: ' + epoch + (version ? '<br>Fork Version: ' + $root.hexstr(version) : '') + (fork_digest ? '<br>Fork Digest: ' + $root.hexstr(fork_digest) : '') + '<br>Time: ' + $root.timestampUtc(new Date(time * 1000)) + (type === 'bpo' ? '<br>Type: Block-Parameter-Only' + (max_blobs_per_block ? '<br>Max Blobs Per Block: ' + max_blobs_per_block : '') : ''), 'data-fork-timestamp': time, 'data-fork-active': active}, text: name"></span>
+              {{ html "<!-- /ko -->" }}
+              {{ range $i, $fork := .NetworkForks }}
+                {{ if $fork.Active }}
+                  <span class="badge rounded-pill text-bg-success me-1 border fork-hover {{ if eq $fork.Type "bpo" }} border-warning{{ end }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="Epoch: {{ $fork.Epoch }}{{ if $fork.Version }}<br>Fork Version: 0x{{ printf "%x" $fork.Version }}{{ end }}{{ if $fork.ForkDigest }}<br>Fork Digest: 0x{{ printf "%x" $fork.ForkDigest }}{{ end }}<br>Time: {{ $fork.Time | uint64ToTime | date "2006-01-02 15:04:05 MST" }}{{ if eq $fork.Type "bpo" }}<br>Type: Block-Parameter-Only{{ if $fork.MaxBlobsPerBlock }}<br>Max Blobs Per Block: {{ $fork.MaxBlobsPerBlock }}{{ end }}{{ end }}" data-fork-timestamp="{{ $fork.Time }}" data-fork-active="true">{{ $fork.Name }}</span>
+                {{ else }}
+                  <span class="badge rounded-pill text-bg-secondary me-1 border fork-hover {{ if eq $fork.Type "bpo" }} border-warning{{ end }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="Epoch: {{ $fork.Epoch }}{{ if $fork.Version }}<br>Fork Version: 0x{{ printf "%x" $fork.Version }}{{ end }}{{ if $fork.ForkDigest }}<br>Fork Digest: 0x{{ printf "%x" $fork.ForkDigest }}{{ end }}<br>Time: {{ $fork.Time | uint64ToTime | date "2006-01-02 15:04:05 MST" }}{{ if eq $fork.Type "bpo" }}<br>Type: Block-Parameter-Only{{ if $fork.MaxBlobsPerBlock }}<br>Max Blobs Per Block: {{ $fork.MaxBlobsPerBlock }}{{ end }}{{ end }}" data-fork-timestamp="{{ $fork.Time }}" data-fork-active="false">{{ $fork.Name }}</span>
+                {{ end }}
+              {{ end }}
+            </div>
+            <i class="fas fa-chevron-down cursor-pointer text-muted toggle-fork-view"
+               onclick="toggleForkView(this);">
+            </i>
+          </div>
+          <div id="forkTable" class="d-none">
+            <div class="table-responsive">
+              <table class="table table-sm table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th scope="col">Fork Name</th>
+                    <th scope="col">Epoch</th>
+                    <th scope="col">Activation Time</th>
+                    <th scope="col">Fork Version</th>
+                    <th scope="col">Fork Digest</th>
+                    <th scope="col" class="d-flex justify-content-between align-items-center">
+                      Status
+                      <i class="fas fa-chevron-up cursor-pointer text-muted toggle-fork-view"
+                         onclick="toggleForkView(this);">
+                      </i>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="template-tbody">
+                  {{ html "<!-- ko foreach: forks -->" }}
+                  <tr class="template-row">
+                    <td>
+                      <strong data-bind="text: name"></strong>
+                    </td>
+                    <td data-bind="text: epoch"></td>
+                    <td data-bind="text: $root.timestampUtc(new Date(time * 1000))"></td>
+                    <td>
+                      <span class="text-monospace small" data-bind="text: version ? $root.hexstr(version) : 'N/A'"></span>
+                    </td>
+                    <td>
+                      <span class="text-monospace small" data-bind="text: fork_digest ? $root.hexstr(fork_digest) : 'N/A'"></span>
+                    </td>
+                    <td>
+                      <span class="badge" data-bind="text: active ? 'Active' : 'Pending', css: {'text-bg-success': active, 'text-bg-secondary': !active}"></span>
+                    </td>
+                  </tr>
+                  {{ html "<!-- /ko -->" }}
+                  {{ range $i, $fork := .NetworkForks }}
+                    <tr>
+                      <td>
+                        <strong>{{ $fork.Name }}</strong>
+                      </td>
+                      <td>{{ $fork.Epoch }}</td>
+                      <td>{{ $fork.Time | uint64ToTime | date "2006-01-02 15:04:05 MST" }}</td>
+                      <td>
+                        <span class="text-monospace small">
+                          {{ if $fork.Version }}0x{{ printf "%x" $fork.Version }}{{ else }}N/A{{ end }}
+                        </span>
+                      </td>
+                      <td>
+                        <span class="text-monospace small">
+                          {{ if $fork.ForkDigest }}0x{{ printf "%x" $fork.ForkDigest }}{{ else }}N/A{{ end }}
+                        </span>
+                      </td>
+                      <td>
+                        {{ if $fork.Active }}
+                          <span class="badge text-bg-success">Active</span>
+                        {{ else }}
+                          <span class="badge text-bg-secondary">Pending</span>
+                        {{ end }}
+                      </td>
+                    </tr>
+                  {{ end }}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{{ end }}

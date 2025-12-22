@@ -1,0 +1,83 @@
+{{ define "page" }}
+  <div class="container mt-2" id="frontpage_container">
+    {{ template "networkOverview" . }}
+    
+    <div class="row">
+      <div class="col-lg-6 mt-3 pr-lg-2">
+        <div class="startpage-panel">
+          {{ template "recentEpochs" . }}
+        </div>
+        <div style="height:30px"></div>
+        <div class="startpage-panel">
+          {{ template "recentBlocks" . }}
+        </div>
+      </div>
+      <div class="col-lg-6 mt-3 pl-lg-2">
+        <div class="startpage-panel">
+          {{ template "recentSlots" . }}
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col text-end">
+        <small class="mx-2 text-start" id="update_timer"></small>
+      </div>
+    </div>
+  </div>
+{{ end }}
+{{ define "js" }}
+  <script src="/js/knockout.min.js"></script>
+  <script src="/js/page-index.js"></script>
+  <script>
+    function toggleForkView(element) {
+      const badges = document.getElementById('forkBadges');
+      const table = document.getElementById('forkTable');
+      
+      if (badges.classList.contains('d-none')) {
+        // Show badges, hide table
+        badges.classList.remove('d-none');
+        table.classList.add('d-none');
+        element.classList.remove('fa-chevron-up');
+        element.classList.add('fa-chevron-down');
+      } else {
+        // Show table, hide badges
+        badges.classList.add('d-none');
+        table.classList.remove('d-none');
+        element.classList.remove('fa-chevron-down');
+        element.classList.add('fa-chevron-up');
+      }
+    }
+  </script>
+{{ end }}
+{{ define "css" }}
+<link rel="stylesheet" href="/css/forkgraph.css" />
+<style>
+  #recent-epochs, #recent-blocks, #recent-slots {
+    margin-bottom: 0;
+  }
+  #update_timer {
+    display: inline-block;
+    min-width: 120px;
+  }
+  .startpage-panel .card-header {
+    padding-top: 2px;
+    padding-bottom: 2px;
+  }
+  .startpage-panel .card-header i {
+    margin-right: 5px;
+  }
+  .tooltip-inner {
+    max-width: max-content;
+    text-align: left;
+  }
+  .cursor-pointer {
+    cursor: pointer;
+  }
+  #forkTable {
+    margin-right: -20px;
+  }
+  #forkTable .toggle-fork-view {
+    margin-right: 10px;
+  }
+</style>
+{{ end }}

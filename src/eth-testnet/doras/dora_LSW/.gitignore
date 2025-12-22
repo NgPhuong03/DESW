@@ -1,0 +1,12 @@
+.vscode
+.DS_Store
+bin
+temp
+config.yaml
+test-config.yaml
+config-*.yaml
+log-*
+tmp-*
+
+.hack/devnet/generated-**
+.hack/devnet/custom-**

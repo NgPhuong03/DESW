@@ -1,0 +1,334 @@
+.bi {
+  vertical-align: -.125em;
+  fill: currentColor;
+}
+
+.pos-relative {
+  position: relative;
+}
+
+.colormode-icon {
+  width: 1em;
+  height: 1em;
+  fill: currentcolor
+}
+
+body main {
+  min-height: calc(100vh - 180px)!important;
+}
+
+@media (min-width: 1650px) {
+  .container, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
+      max-width: 1520px;
+  }
+}
+
+.header {
+  height: 70px;
+}
+
+.footer {
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+header.header-bar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  box-shadow: 0 0.5em 1.5em rgba(0, 0, 0, .1), 0 0.125em 0.5em rgba(0, 0, 0, .15);
+}
+
+@media (min-width: 992px) {
+  header .collapsed-info {
+    display: none;
+  }
+}
+
+header .explorer-brand {
+  display: inline-block;
+  position: relative;
+}
+
+header .explorer-brand-spacer {
+  visibility: hidden;
+}
+
+header .explorer-brand-container {
+  position: absolute;
+  z-index: 100;
+  width: 100%;
+  height: 60px;
+  top: -18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+header .explorer-brand .explorer-brand-subtitle {
+  font-size: 14px;
+}
+
+header .main-search {
+  text-align: center;
+  margin: 0 24px;
+}
+
+header .main-search .main-search-wrapper {
+  display: inline-block;
+  max-width: 600px;
+  width: 100%;
+}
+
+header .main-search .main-search-wrapper > * {
+  width: 100%;
+}
+
+header .main-search .search-input {
+  border-color: #495057;
+  width: 100%;
+  z-index: 101;
+}
+
+header .main-search .search-input::placeholder {
+  color: #adb5bd;
+}
+
+header .main-search .search-input:focus {
+  outline: none !important;
+  box-shadow: none;
+}
+
+header .main-search .main-search-wrapper .tt-menu {
+  width: 100%;
+  top: calc(100% - 2px) !important;
+  background-color: #212529;
+  border: 1px solid #495057;
+  text-align: left;
+  padding: 16px 0 8px 0;
+}
+
+header .main-search .main-search-wrapper .tt-dataset {
+  margin-bottom: 8px;
+}
+
+header .main-search .main-search-wrapper .tt-dataset > h3,
+header .main-search .main-search-wrapper .tt-suggestion {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+header .main-search .main-search-wrapper .tt-suggestion {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+header .main-search .main-search-wrapper .tt-dataset > h3 {
+  font-size: 12px;
+  margin-bottom: 4px;
+  color: #adb5bd;
+  font-weight: normal;
+}
+
+header .main-search .main-search-wrapper .tt-suggestion.tt-selectable {
+  cursor: pointer;
+}
+
+header .main-search .main-search-wrapper .tt-suggestion.tt-selectable.tt-cursor {
+  background-color: #495057;
+}
+
+header .main-search .search-table {
+  display: flex;
+}
+
+header .main-search .search-table > .search-cell {
+  min-width: 100px;
+}
+
+header .main-search .search-table > .search-truncate {
+  flex-grow: 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+
+nav .navbar-nav .nav-link {
+  color: rgba(255, 255, 255, 0.65)
+}
+nav .navbar-nav .nav-link.show,
+nav .navbar-nav .nav-link.active {
+  color: rgb(255, 255, 255)
+}
+
+nav .navbar-nav .nav-link:hover {
+  color: rgba(255, 255, 255, 1)
+}
+
+nav .theme-selector .theme-navicon {
+  display: inline;
+  height: 40px;
+}
+
+nav .theme-selector .theme-navlabel {
+  margin-left: 2px;
+}
+
+header nav .navbar-toggler.toggler-wrapper {
+  position: relative;
+  border: 0;
+  padding: 0;
+  height: 40px;
+  display: block;
+  width: 55px;
+}
+header nav .navbar-toggler.toggler-wrapper > * {
+  position: absolute;
+  z-index: 101;
+}
+
+header nav .nav-item:hover .dropdown-menu,
+header nav .nav-item:focus-within .dropdown-menu {
+  display: block;
+}
+
+header nav .dropdown-menu hr {
+  margin: 6px 0;
+}
+
+header nav .dropdown-item .nav-icon {
+  padding-right: 6px;
+}
+
+@media (max-width: 992px) {
+  header .navbar-brand {
+    margin-right: 0;
+  }
+
+  header .main-search {
+    margin: 16px 0;
+  }
+
+  header .main-search .main-search-wrapper {
+    max-width: none;
+  }
+
+  nav .navbar-nav .dropdown-menu {
+    border: none;
+  }
+}
+
+.tab-content .tab-pane > .card:first-child {
+  border-top: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.table-ellipsis table tbody td {
+  text-overflow: ellipsis;
+  max-width: 200px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+@media (max-width: 992px) {
+  .table-ellipsis table tbody td {
+    max-width: 100px;
+  }
+}
+
+.table.table-nobr tbody td {
+  white-space: nowrap;
+}
+
+.table .template-row {
+  display: none;
+}
+
+span.validator-label {
+  white-space: nowrap;
+}
+
+.table-paging {
+  text-align: right;
+}
+
+.table-pagesize label {
+  white-space: nowrap;
+}
+
+.table-pagesize label > * {
+  display: inline-block;
+  width: auto;
+  margin: 0 1px;
+}
+
+.table-search label {
+  width: 300px;
+}
+
+.h1-pager > a {
+  width: 24px;
+  display: inline-block;
+  margin: 0 8px;
+}
+.h1-pager > span {
+  display: inline-block;
+  min-width: 180px;
+}
+
+.responsive-border-right {
+  border-right-color: var(--bs-card-border-color);
+  border-right-style: solid;
+  border-right-width: 1px;
+}
+
+@media (max-width: 767px) {
+  .responsive-border-right-l {
+      border: hidden;
+  }
+}
+
+.text-truncate {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.table-sorting thead .col-sorting {
+  display: inline-block;
+  margin-left: 5px;
+}
+
+.table-sorting thead .sort-link {
+  margin-left: -3px;
+  color: var(--bs-table-color-state,var(--bs-table-color-type,var(--bs-table-color)));
+  font-size: 14px;
+  opacity: 0.3;
+}
+
+.table-sorting thead .sort-link:hover, .table-sorting thead .sort-link.active {
+  opacity: 1;
+}
+
+.ellipsis-copy-btn {
+  float: right;
+}
+
+
+.table-borderless > tbody > tr > td,
+.table-borderless > tbody > tr > th,
+.table-borderless > tfoot > tr > td,
+.table-borderless > tfoot > tr > th,
+.table-borderless > thead > tr > td,
+.table-borderless > thead > tr > th {
+    border: none;
+}
+
+.table-sm>:not(caption)>*>* {
+  padding: 1px .25rem;
+}
+
+.text-monospace {
+  font-family: var(--bs-font-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace) !important;
+}
