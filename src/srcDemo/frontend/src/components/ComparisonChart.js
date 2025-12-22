@@ -53,9 +53,6 @@ const ComparisonChart = ({
     ...results.map((r) => r.simulation_data?.[metric]?.length || 0)
   );
 
-  // Backend chỉ trả về ~200 điểm đã được downsample.
-  // Nếu biết tổng số epoch thực tế, map 200 điểm này đều lên [1, totalEpochs],
-  // tương tự logic trong ResultsChart.
   const sampleCount = maxLength;
   const effectiveTotalEpochs = totalEpochs || sampleCount;
   const labels = Array.from({ length: sampleCount }, (_, i) => {

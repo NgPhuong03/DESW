@@ -8,7 +8,7 @@ const analysisService = new RealDataAnalysisService();
 
 /**
  * GET /api/real-data/chains
- * Lấy danh sách các blockchain được hỗ trợ
+ * Get list of supported blockchains
  */
 function getChains(req, res) {
   try {
@@ -29,7 +29,7 @@ function getChains(req, res) {
 
 /**
  * GET /api/real-data/collect/:chainName?
- * Thu thập dữ liệu từ một chain cụ thể hoặc tất cả chains
+ * Collect data from a specific chain or all chains
  */
 async function collectData(req, res) {
   try {
@@ -37,10 +37,8 @@ async function collectData(req, res) {
 
     let result;
     if (chainName) {
-      // Thu thập dữ liệu từ một chain
       result = await dataService.fetchSingleChain(chainName);
     } else {
-      // Thu thập dữ liệu từ tất cả chains
       result = await dataService.fetchAllChainsData();
     }
 
@@ -56,8 +54,8 @@ async function collectData(req, res) {
 
 /**
  * POST /api/real-data/analyze
- * Phân tích dữ liệu với các thuật toán
- * Body: { chainData: {...} } hoặc { chainsData: {...} }
+ * Analyze data with algorithms
+ * Body: { chainData: {...} } or { chainsData: {...} }
  */
 async function analyzeData(req, res) {
   try {
@@ -65,10 +63,8 @@ async function analyzeData(req, res) {
 
     let result;
     if (chainData) {
-      // Phân tích một chain
       result = analysisService.analyzeBlockchain(chainData);
     } else if (chainsData) {
-      // Phân tích nhiều chains
       result = analysisService.analyzeMultipleChains(chainsData);
     } else {
       return res.status(400).json({
@@ -94,12 +90,11 @@ async function analyzeData(req, res) {
 
 /**
  * GET /api/real-data/full-analysis/:chainName?
- * Thu thập dữ liệu và phân tích trong một request
+ * Collect data and analyze in a single request
  */
 async function fullAnalysis(req, res) {
   try {
     const { chainName } = req.params;
-    // Hỗ trợ chọn nhiều chain: ?chains=eth,aptos,sui
     const chainQuery =
       typeof req.query.chains === "string"
         ? req.query.chains
@@ -108,7 +103,6 @@ async function fullAnalysis(req, res) {
             .filter(Boolean)
         : null;
 
-    // Step 1: Thu thập dữ liệu
     let collectionResult;
     if (chainName) {
       collectionResult = await dataService.fetchSingleChain(chainName);
@@ -116,7 +110,6 @@ async function fullAnalysis(req, res) {
       collectionResult = await dataService.fetchAllChainsData(chainQuery);
     }
 
-    // Step 2: Phân tích dữ liệu
     let analysisResult;
     if (chainName) {
       // Single chain analysis
@@ -146,7 +139,6 @@ async function fullAnalysis(req, res) {
       );
     }
 
-    // Step 3: Generate additional insights
     let comparisonMatrix = null;
     let summaryStats = null;
 
@@ -178,7 +170,7 @@ async function fullAnalysis(req, res) {
 
 /**
  * POST /api/real-data/comparison-matrix
- * Tạo comparison matrix từ analysis results
+ * Generate comparison matrix from analysis results
  */
 function generateComparisonMatrix(req, res) {
   try {
@@ -212,7 +204,7 @@ function generateComparisonMatrix(req, res) {
 
 /**
  * GET /api/real-data/health
- * Health check cho real data services
+ * Health check for real data services
  */
 function healthCheck(req, res) {
   try {
@@ -243,8 +235,8 @@ function healthCheck(req, res) {
 
 /**
  * GET /api/real-data/csv/list
- * Lấy danh sách các CSV files đã lưu
- * Query params: ?chain=chainName (optional) để filter theo chain
+ * Get list of saved CSV files
+ * Query params: ?chain=chainName (optional) to filter by chain
  */
 function listCSVFiles(req, res) {
   try {
@@ -269,7 +261,7 @@ function listCSVFiles(req, res) {
 
 /**
  * GET /api/real-data/csv/download/:filename
- * Download một CSV file cụ thể
+ * Download a specific CSV file
  */
 function downloadCSV(req, res) {
   try {
@@ -277,7 +269,6 @@ function downloadCSV(req, res) {
     const csvDir = path.join(__dirname, "..", "data", "csv");
     const filepath = path.join(csvDir, filename);
 
-    // Security: chỉ cho phép download files trong csvDir
     if (!filepath.startsWith(csvDir)) {
       return res.status(403).json({
         success: false,
@@ -285,7 +276,6 @@ function downloadCSV(req, res) {
       });
     }
 
-    // Kiểm tra file tồn tại
     if (!fs.existsSync(filepath)) {
       return res.status(404).json({
         success: false,
@@ -293,11 +283,9 @@ function downloadCSV(req, res) {
       });
     }
 
-    // Set headers để download file
     res.setHeader("Content-Type", "text/csv");
     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
 
-    // Stream file
     const fileStream = fs.createReadStream(filepath);
     fileStream.pipe(res);
   } catch (error) {

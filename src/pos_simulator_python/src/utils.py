@@ -354,11 +354,11 @@ def zipf_coefficient(data: List[float]) -> float:
     sum_y = np.sum(log_weights)
     sum_xy = np.sum(log_ranks * log_weights)
     sum_x2 = np.sum(log_ranks * log_ranks)
-    
+
     denominator = n * sum_x2 - sum_x * sum_x
     if abs(denominator) < 1e-10:  # Avoid division by zero
         return 0.0
-    
+
     slope = (n * sum_xy - sum_x * sum_y) / denominator
 
     # Zipf's Law coefficient is the negative of the slope
@@ -1013,25 +1013,23 @@ def dynamic_reward(
     base_reward: float, validator_stake: float, total_stake: float
 ) -> float:
     """
-    Calculate dynamic reward tỷ lệ với stake của validator
+    Calculate dynamic reward proportional to validator stake
 
     Reward = base_reward * (stake_percentage + 1)
-    Validator có stake lớn hơn nhận reward nhiều hơn
+    Validator with larger stake receives more reward
 
     Args:
-        base_reward: Reward cơ bản
-        validator_stake: Stake của validator được chọn
-        total_stake: Tổng stake trong hệ thống
+        base_reward: Base reward amount
+        validator_stake: Stake of selected validator
+        total_stake: Total stake in the system
 
     Returns:
-        Reward amount tỷ lệ với stake
+        Reward amount proportional to stake
     """
     if total_stake == 0:
         return base_reward
 
     stake_percentage = validator_stake / total_stake
-    # Reward = base_reward * (1 + stake_percentage)
-    # Ví dụ: stake_percentage = 0.1 (10%) -> reward = base_reward * 1.1
     return base_reward * (1 + stake_percentage)
 
 
@@ -1039,13 +1037,13 @@ def stake_based_reward(
     base_reward: float, validator_stake: float, total_stake: float
 ) -> float:
     """
-    Calculate reward dựa trên stake percentage của validator
-    Validator có stake lớn hơn nhận reward nhiều hơn
+    Calculate reward based on validator stake percentage
+    Validator with larger stake receives more reward
 
     Args:
-        base_reward: Reward cơ bản
-        validator_stake: Stake của validator được chọn
-        total_stake: Tổng stake trong hệ thống
+        base_reward: Base reward amount
+        validator_stake: Stake of selected validator
+        total_stake: Total stake in the system
 
     Returns:
         Reward amount
@@ -1433,21 +1431,20 @@ def perform_scheduled_sybil(
     num_splits: int,
 ) -> bool:
     """
-    Thực hiện Sybil attack theo lịch: split validator của entity cụ thể
+    Perform scheduled Sybil attack: split validator of specific entity
 
     Args:
         stakes: Current stake list (modified in place)
         entity_ids: List mapping validator index to entity ID (modified in place)
-        target_entity_id: Entity ID cần thực hiện Sybil attack
-        num_splits: Số validators để split thành
+        target_entity_id: Entity ID to perform Sybil attack on
+        num_splits: Number of validators to split into
 
     Returns:
-        True nếu thành công, False nếu không tìm thấy validator phù hợp
+        True if successful, False if no matching validator found
     """
     if not stakes or num_splits < 2:
         return False
 
-    # Tìm tất cả validators có entity_id = target_entity_id
     candidates = [
         (i, stakes[i])
         for i in range(len(stakes))
@@ -1457,7 +1454,6 @@ def perform_scheduled_sybil(
     if not candidates:
         return False
 
-    # Chọn validator có stake lớn nhất
     victim_idx, original_stake = max(candidates, key=lambda x: x[1])
 
     # Split stake equally

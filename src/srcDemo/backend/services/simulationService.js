@@ -230,7 +230,6 @@ function mapEngineResults(rawResults = {}, applySampling = false) {
       nakamoto_liveness: rawResults.final_results?.final_nakamoto_liveness ?? 0,
       nakamoto_safety: rawResults.final_results?.final_nakamoto_safety ?? 0,
       zipf: rawResults.final_results?.final_zipf ?? 0,
-      // Lưu số lượng peer ở epoch cuối (không cần history)
       n_peers:
         rawResults.final_results?.final_network_size ??
         (Array.isArray(rawResults.network_size_history) &&

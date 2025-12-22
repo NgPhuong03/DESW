@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Đo thời gian tính chỉ số Gini theo số lượng peer và kiểu phân phối stake khác nhau
+Measure Gini coefficient computation time for different peer counts and stake distribution patterns
 
-Kết quả sẽ được in ra màn hình và lưu vào JSON/CSV trong thư mục results/ cùng cấp.
+Results will be printed to screen and saved to JSON/CSV in the results/ directory at the same level.
 """
 
 import os
@@ -21,11 +21,11 @@ from timing_utils import gini_with_timing  # noqa: E402
 
 
 def generate_stakes(num_peers: int, pattern: str, scale: float = 1_000_000.0) -> list:
-    """Tạo danh sách stake theo mẫu phân phối.
+    """Generate stake list according to distribution pattern.
 
     pattern:
-      - "uniform": tất cả bằng nhau
-      - "random": random uniform trong [1, scale]
+      - "uniform": all equal
+      - "random": random uniform in [1, scale]
     """
     if num_peers <= 0:
         return []
@@ -36,9 +36,6 @@ def generate_stakes(num_peers: int, pattern: str, scale: float = 1_000_000.0) ->
     if pattern == "random":
         return [float(np.random.uniform(1.0, scale)) for _ in range(num_peers)]
 
-    # Các mẫu phân phối khác đã được loại bỏ theo yêu cầu
-
-    # fallback
     return [float(np.random.uniform(1.0, scale)) for _ in range(num_peers)]
 
 
@@ -47,7 +44,7 @@ def benchmark_gini_time(
     patterns: list,
     iterations_per_case: int = 50,
 ):
-    """Đo thời gian tính Gini cho các cấu hình khác nhau."""
+    """Measure Gini computation time for different configurations."""
     results = {}
 
     for n in peer_sizes:
@@ -56,7 +53,6 @@ def benchmark_gini_time(
             exec_times = []
             gini_values = []
 
-            # Chuẩn bị dataset cố định cho fairness giữa iterations
             stakes = generate_stakes(n, pattern)
 
             for _ in range(iterations_per_case):
@@ -132,14 +128,12 @@ def save_results(results: dict):
 
 
 def main():
-    # Cấu hình mặc định
     random.seed(42)
     np.random.seed(42)
 
     peer_sizes = [10000, 100000, 1000000, 10000000]
     patterns = ["uniform", "random"]
     iterations_per_case = 50
-
 
     original_results = benchmark_gini_time(peer_sizes, patterns, iterations_per_case)
     save_results(original_results)

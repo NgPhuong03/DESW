@@ -52,8 +52,6 @@ const ResultsChart = ({
     );
   }
 
-  // Backend trả về ~200 điểm đã được downsample.
-  // Nếu biết tổng số epoch thực tế, map 200 điểm này đều lên [1, totalEpochs].
   const sampleCount = primaryData.length;
   const effectiveTotalEpochs = totalEpochs || sampleCount;
   const epochs = primaryData.map((_, i) => {

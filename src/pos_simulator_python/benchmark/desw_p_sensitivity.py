@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 DESW p-range sensitivity experiment
-Chạy cùng một kịch bản nhiều lần với (pmin, pmax) khác nhau để phân tích độ nhạy.
-Sinh heatmap (final_gini) và line-chart tùy chọn.
+Run the same scenario multiple times with different (pmin, pmax) to analyze sensitivity.
+Generate heatmap (final_gini) and optional line-chart.
 """
 
 import os
@@ -30,7 +30,6 @@ def run_single_experiment(
     params: Parameters, stakes: List[float], corrupted: List[int]
 ) -> Dict:
     """Run a single DESW experiment and return metrics like benchmark_algorithms.py"""
-    # Create parameter copy with specific algorithm (giống desw_experiment.py)
     test_params = Parameters(
         n_epochs=params.n_epochs,
         proof_of_stake=PoS.DESW,
@@ -47,16 +46,10 @@ def run_single_experiment(
         scheduled_joins=params.scheduled_joins,
     )
 
-    # print(f"gini ban dau: {gini(stakes):.3f}")
-    # print(f"params ban dau: {params}")
-    # print(f"params test: {test_params}")
-
-    # Create copies to avoid modifying original data (giống desw_experiment.py)
     test_stakes = stakes.copy()
     test_corrupted = corrupted.copy()
 
     start_time = time.time()
-    # Không cần Shapley cho sensitivity này, tắt cho nhanh
     gini_history, peers_history, nakamoto_history, *_ = simulate(
         stakes, corrupted, test_params, compute_shapley=False
     )
@@ -117,7 +110,7 @@ def sweep_p_ranges(
                 results["grid"][pmin][pmax] = None
                 continue
 
-            # Set simulator global pmin/pmax (uncomment để test sensitivity)
+            # Set simulator global pmin/pmax (uncomment to test sensitivity)
             sim.pmin = pmin
             sim.pmax = pmax
             print(f"Cap minmax trong code la pmin: {pmin}, pmax: {pmax}")
@@ -207,7 +200,7 @@ def test_baseline(
     corrupted: List[int],
     runs: int = 10,
 ) -> Dict:
-    """Test baseline DESW without setting pmin/pmax (giống desw_experiment.py)"""
+    """Test baseline DESW without setting pmin/pmax"""
     print(f"\nTesting baseline DESW (no pmin/pmax setting)...")
 
     baseline_results = []
@@ -238,7 +231,6 @@ def main():
 
     scheduled_joins = []
 
-    # Scenario (giữ giống kịch bản chuẩn, có thể chỉnh nhanh tại đây)
     params = Parameters(
         n_epochs=20000,
         proof_of_stake=PoS.DESW,
@@ -255,7 +247,6 @@ def main():
         scheduled_joins=scheduled_joins,
     )
 
-    # Dữ liệu ban đầu dùng chung (giống desw_experiment.py)
     stakes = generate_peers(
         params.n_peers,
         params.initial_stake_volume,
@@ -268,7 +259,6 @@ def main():
     print(f"Peers: {len(stakes)}, Corrupted: {len(corrupted)}")
     print(f"Epochs: {params.n_epochs}")
 
-    # Lưới pmin/pmax
     pmin_list = [0.0, 0.1, 0.2, 0.3, 0.4]
     pmax_list = [0.6, 0.7, 0.8, 0.9, 1.0]
 
@@ -282,7 +272,6 @@ def main():
         pmin_list, pmax_list, params, stakes, corrupted, runs_per_point=10
     )
 
-    # Lưu kết quả + vẽ
     out_dir = os.path.join(os.path.dirname(__file__), "results")
     os.makedirs(out_dir, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -297,16 +286,13 @@ def main():
 
     plot_lines(results, fixed_pmin_list=[0.0, 0.1], out_dir=out_dir, tag=ts)
 
-    # So sánh kết quả
-    print("\n" + "=" * 80)
+
     print("COMPARISON RESULTS:")
-    print("=" * 80)
     print(
         f"{'Test Type':<20} {'Final Gini':<15} {'Final Nakamoto':<15} {'Execution Time':<15}"
     )
     print("-" * 80)
 
-    # Baseline results (không set pmin/pmax)
     print(
         f"{'Baseline (no pmin/pmax)':<20} "
         f"{baseline_stats['final_gini_mean']:.3f}±{baseline_stats['final_gini_std']:.3f}   "
@@ -314,7 +300,6 @@ def main():
         f"{baseline_stats['execution_time_total']:.3f}s"
     )
 
-    # Sensitivity results (có set pmin/pmax)
     if results["grid"] and 0.0 in results["grid"] and 1.0 in results["grid"][0.0]:
         sens_stats = results["grid"][0.0][1.0]
         print(
@@ -324,7 +309,6 @@ def main():
             f"{sens_stats['execution_time_total']:.3f}s"
         )
 
-        # Tính chênh lệch
         gini_diff = sens_stats["final_gini_mean"] - baseline_stats["final_gini_mean"]
         nakamoto_diff = (
             sens_stats["final_nakamoto_mean"] - baseline_stats["final_nakamoto_mean"]

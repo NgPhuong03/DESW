@@ -1,5 +1,5 @@
 """
-Helper module để track rewards cho một entity cụ thể trong simulation
+Helper module to track rewards for a specific entity in simulation
 """
 
 from typing import List, Tuple, Dict
@@ -60,7 +60,7 @@ def simulate_with_reward_tracking(
     stakes: List[float],
     corrupted: List[int],
     params: Parameters,
-    tracked_entity_id: int = 0,  # Entity ID cần track rewards
+    tracked_entity_id: int = 0,  # Entity ID to track rewards
 ) -> Tuple[
     List[float],
     List[int],
@@ -79,24 +79,22 @@ def simulate_with_reward_tracking(
     int,  # Number of times tracked entity was selected
 ]:
     """
-    Run simulation và track tổng phần thưởng cho một entity cụ thể
+    Run simulation and track total rewards for a specific entity
 
     Args:
         stakes: Initial stake for each peer
         corrupted: List of indices of corrupted peers
         params: Simulation parameters
-        tracked_entity_id: Entity ID cần track (default: 0 = validator đầu tiên)
+        tracked_entity_id: Entity ID to track (default: 0 = first validator)
 
     Returns:
-        Tuple giống simulate() + (total_rewards, selection_count)
+        Tuple same as simulate() + (total_rewards, selection_count)
     """
     stakes = copy.deepcopy(stakes)
     corrupted = copy.deepcopy(corrupted)
 
-    # Initialize entity_ids
     entity_ids = list(range(len(stakes)))
 
-    # Track rewards cho entity
     total_rewards = 0.0
     selection_count = 0
 
@@ -204,14 +202,11 @@ def simulate_with_reward_tracking(
             else:
                 validator = consensus(params.proof_of_stake, stakes)
 
-        # Track rewards cho tracked entity (bao gồm cả validators con sau Sybil)
         validator_entity_id = (
             entity_ids[validator] if validator < len(entity_ids) else -1
         )
 
-        # Calculate reward (dynamic hoặc constant)
         if params.use_dynamic_reward:
-            # Dynamic reward: tỷ lệ với stake percentage
             total_stake = sum(stakes)
             current_reward = dynamic_reward(
                 params.reward, stakes[validator], total_stake
@@ -221,13 +216,11 @@ def simulate_with_reward_tracking(
 
         # Apply reward/penalty
         if validator in corrupted and random.random() > 1 - params.p_fail:
-            # Penalty (không tính reward)
             stakes[validator] *= 1 - params.penalty_percentage
         else:
             # Reward
             stakes[validator] += current_reward
 
-            # Track nếu là entity được theo dõi (bao gồm validators con)
             if validator_entity_id == tracked_entity_id:
                 total_rewards += current_reward
                 selection_count += 1

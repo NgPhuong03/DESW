@@ -42,7 +42,6 @@ try:
         shapley_gini,
     )
 except ImportError:
-    # Khi chạy như script, sử dụng absolute imports
     from parameters import Parameters, PoS, SType
     from utils import (
         gini,
@@ -98,8 +97,8 @@ def simulate(
         stakes: Initial stake for each peer
         corrupted: List of indices of corrupted peers
         params: Simulation parameters
-        compute_shapley: Nếu True, sẽ tính Shapley Gini ở epoch cuối (tốn thời gian)
-        shapley_samples: Số lượng mẫu Monte Carlo cho shapley_gini (mặc định 10000).
+        compute_shapley: If True, will compute Shapley Gini at final epoch (time-consuming)
+        shapley_samples: Number of Monte Carlo samples for shapley_gini (default 10000).
 
     Returns:
         Tuple of (
@@ -140,7 +139,6 @@ def simulate(
     palma_history = []
     shannon_history = []
 
-    # Shapley Gini (chỉ tính ở epoch cuối cùng nếu được bật)
     shapley_gini_liveness_final = 0.0
     shapley_gini_safety_final = 0.0
     shapley_gini_correlation_final = 0.0
@@ -180,7 +178,6 @@ def simulate(
         )
         try_to_leave(stakes, params.p_leave)
 
-        # Sync entity_ids với stakes (thêm mới hoặc xóa bớt)
         while len(entity_ids) < len(stakes):
             entity_ids.append(max(entity_ids) + 1 if entity_ids else 0)
         while len(entity_ids) > len(stakes):
@@ -273,9 +270,7 @@ def simulate(
             else:
                 validator = consensus(params.proof_of_stake, stakes)
 
-        # Calculate reward (dynamic hoặc constant)
         if params.use_dynamic_reward:
-            # Dynamic reward: tỷ lệ với stake percentage
             total_stake = sum(stakes)
             current_reward = dynamic_reward(
                 params.reward, stakes[validator], total_stake
@@ -295,21 +290,19 @@ def simulate(
         # Record number of peers
         n_peers_history.append(len(stakes))
 
-    # Tính Shapley Gini ở epoch cuối cùng (dùng stakes cuối cùng) nếu được bật
     if compute_shapley and shapley_samples > 0:
         try:
             print(
-                f"\nĐang tính Shapley Gini ở epoch cuối cùng (n_epochs={params.n_epochs}, num_samples={shapley_samples})..."
+                f"\nComputing Shapley Gini at final epoch (n_epochs={params.n_epochs}, num_samples={shapley_samples})..."
             )
             (
                 shapley_gini_liveness_final,
                 shapley_gini_safety_final,
                 shapley_gini_correlation_final,
             ) = shapley_gini(stakes, num_samples=shapley_samples)
-            print("  ✓ Hoàn thành tính Shapley Gini (simulate).")
+            print("  ✓ Completed Shapley Gini computation (simulate).")
         except Exception as e:
-            # Không để benchmark/simulation fail chỉ vì Shapley, log warning và để 0
-            print(f"  ⚈ Cảnh báo: lỗi khi tính Shapley Gini trong simulate(): {e}")
+            print(f"  ⚈ Warning: error computing Shapley Gini in simulate(): {e}")
             shapley_gini_liveness_final = 0.0
             shapley_gini_safety_final = 0.0
             shapley_gini_correlation_final = 0.0
@@ -492,9 +485,7 @@ def simulate_verbose(
             else:
                 validator = consensus(params.proof_of_stake, stakes)
 
-        # Calculate reward (dynamic hoặc constant)
         if params.use_dynamic_reward:
-            # Dynamic reward: tỷ lệ với stake percentage
             total_stake = sum(stakes)
             current_reward = dynamic_reward(
                 params.reward, stakes[validator], total_stake
@@ -514,21 +505,20 @@ def simulate_verbose(
         # Record number of peers
         n_peers_history.append(len(stakes))
 
-    # Tính Shapley Gini ở epoch cuối cùng nếu được bật
     if compute_shapley and shapley_samples > 0:
         try:
             print(
-                f"\nĐang tính Shapley Gini ở epoch cuối cùng (n_epochs={params.n_epochs}, num_samples={shapley_samples})..."
+                f"\nComputing Shapley Gini at final epoch (n_epochs={params.n_epochs}, num_samples={shapley_samples})..."
             )
             (
                 shapley_gini_liveness_final,
                 shapley_gini_safety_final,
                 shapley_gini_correlation_final,
             ) = shapley_gini(stakes, num_samples=shapley_samples)
-            print("  ✓ Hoàn thành tính Shapley Gini (simulate_verbose).")
+            print("  ✓ Completed Shapley Gini computation (simulate_verbose).")
         except Exception as e:
             print(
-                f"  ⚈ Cảnh báo: lỗi khi tính Shapley Gini trong simulate_verbose(): {e}"
+                f"  ⚈ Warning: error computing Shapley Gini in simulate_verbose(): {e}"
             )
             shapley_gini_liveness_final = 0.0
             shapley_gini_safety_final = 0.0
@@ -589,8 +579,8 @@ def run_experiment(
         initial_gini: Initial Gini coefficient
         params: Simulation parameters
         verbose: Whether to show progress bar
-        compute_shapley: Có tính Shapley Gini ở epoch cuối không
-        shapley_samples: Số samples cho Shapley Gini nếu compute_shapley=True
+        compute_shapley: Whether to compute Shapley Gini at final epoch
+        shapley_samples: Number of samples for Shapley Gini if compute_shapley=True
 
     Returns:
         Tuple of (gini_history, n_peers_history, nakamoto_history, hhi_history,

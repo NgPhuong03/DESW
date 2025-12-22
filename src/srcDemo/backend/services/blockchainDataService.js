@@ -1,8 +1,8 @@
 /**
  * Blockchain Data Collection Service
  *
- * Thu thập dữ liệu validators thực từ các blockchain
- * Tích hợp từ analysis_chains project
+ * Collect real validator data from blockchains
+ * Integrated from analysis_chains project
  */
 
 const axios = require("axios");
@@ -25,7 +25,7 @@ class BlockchainDataService {
   }
 
   /**
-   * Thu thập dữ liệu Ethereum từ Dune Analytics
+   * Collect Ethereum data from Dune Analytics
    */
   async fetchEthereumData() {
     try {
@@ -83,7 +83,6 @@ class BlockchainDataService {
         timestamp: new Date().toISOString(),
       };
 
-      // Lưu CSV file
       this.saveToCSV(result);
 
       return result;
@@ -100,7 +99,7 @@ class BlockchainDataService {
   }
 
   /**
-   * Thu thập dữ liệu Aptos từ Google Storage + RPC
+   * Collect Aptos data from Google Storage + RPC
    */
   async fetchAptosData() {
     try {
@@ -119,8 +118,6 @@ class BlockchainDataService {
         throw new Error("Invalid validators data format");
       }
 
-      // Step 2: Get stake info for each validator (process all validators)
-      // Giống Python: chỉ thêm validators với tokens > 0 và tokens is not None
       const validatorsList = validatorsResponse.data;
       const validators = [];
 
@@ -130,16 +127,13 @@ class BlockchainDataService {
 
         try {
           const tokens = await this.getAptosTokens(ownerAddress);
-          // Chỉ thêm validators với tokens > 0 và tokens is not None (giống Python)
           if (tokens !== null && tokens !== undefined && tokens > 0) {
             validators.push({
               address: ownerAddress,
               tokens: tokens,
             });
           }
-          // Skip validators with invalid/missing data (silently) - giống Python
         } catch (error) {
-          // Skip validators with errors (giống Python)
           console.warn(
             `Failed to get tokens for ${ownerAddress}:`,
             error.message
@@ -159,7 +153,6 @@ class BlockchainDataService {
         timestamp: new Date().toISOString(),
       };
 
-      // Lưu CSV file
       this.saveToCSV(result);
 
       return result;
@@ -177,7 +170,7 @@ class BlockchainDataService {
 
   /**
    * Get tokens for specific Aptos validator
-   * Giống Python: return None (null) nếu có lỗi, không return 0
+   * Returns null on error, not 0 (matches Python behavior)
    */
   async getAptosTokens(address) {
     try {
@@ -190,26 +183,22 @@ class BlockchainDataService {
       );
 
       if (response.status !== 200) {
-        // API returned error, return null instead of raising exception (giống Python)
         return null;
       }
 
-      // Check if keys exist before access to avoid KeyError (giống Python)
       const activeValue = response.data?.data?.active?.value;
       if (activeValue !== null && activeValue !== undefined) {
         return parseInt(activeValue);
       } else {
-        // Missing required keys, return null (will be filtered out) - giống Python
         return null;
       }
     } catch (error) {
-      // Handle any parsing errors gracefully - return null (giống Python)
       return null;
     }
   }
 
   /**
-   * Thu thập dữ liệu Celestia từ Explorer API
+   * Collect Celestia data from Explorer API
    */
   async fetchCelestiaData() {
     try {
@@ -224,7 +213,6 @@ class BlockchainDataService {
         throw new Error("Invalid validators data format");
       }
 
-      // Giống Python: dùng moniker (có thể là None), convert tokens sang int
       const validators = response.data
         .map((validator) => ({
           address: validator.moniker || validator.operator_address || null,
@@ -242,7 +230,6 @@ class BlockchainDataService {
         timestamp: new Date().toISOString(),
       };
 
-      // Lưu CSV file
       this.saveToCSV(result);
 
       return result;
@@ -259,7 +246,7 @@ class BlockchainDataService {
   }
 
   /**
-   * Thu thập dữ liệu Polygon từ Validator.info API
+   * Collect Polygon data from Validator.info API
    */
   async fetchPolygonData() {
     try {
@@ -282,7 +269,6 @@ class BlockchainDataService {
         throw new Error("Invalid validators data format");
       }
 
-      // Giống Python: dùng validator.get('name', '') - empty string nếu không có
       const validators = validatorsList
         .map((validator) => ({
           address: validator.name || validator.address || "",
@@ -300,7 +286,6 @@ class BlockchainDataService {
         timestamp: new Date().toISOString(),
       };
 
-      // Lưu CSV file
       this.saveToCSV(result);
 
       return result;
@@ -317,7 +302,7 @@ class BlockchainDataService {
   }
 
   /**
-   * Thu thập dữ liệu Sui từ JSON-RPC API
+   * Collect Sui data from JSON-RPC API
    */
   async fetchSuiData() {
     try {
@@ -342,7 +327,6 @@ class BlockchainDataService {
         throw new Error("Invalid validators data format");
       }
 
-      // Giống Python: dùng validator.get('name', '') - empty string nếu không có
       const validators = activeValidators
         .map((validator) => ({
           address: validator.name || validator.suiAddress || "",
@@ -360,7 +344,6 @@ class BlockchainDataService {
         timestamp: new Date().toISOString(),
       };
 
-      // Lưu CSV file
       this.saveToCSV(result);
 
       return result;
@@ -377,7 +360,7 @@ class BlockchainDataService {
   }
 
   /**
-   * Thu thập dữ liệu Injective từ LCD API
+   * Collect Injective data from LCD API
    */
   async fetchInjectiveData() {
     try {
@@ -393,7 +376,6 @@ class BlockchainDataService {
         throw new Error("Invalid validators data format");
       }
 
-      // Giống Python: dùng validator.get('address', None) - có thể None
       const validators = validatorsList
         .map((validator) => ({
           address: validator.address || null,
@@ -411,7 +393,6 @@ class BlockchainDataService {
         timestamp: new Date().toISOString(),
       };
 
-      // Lưu CSV file
       this.saveToCSV(result);
 
       return result;
@@ -428,7 +409,7 @@ class BlockchainDataService {
   }
 
   /**
-   * Thu thập dữ liệu Celo từ TheCelo API
+   * Collect Celo data from TheCelo API
    */
   async fetchCeloData() {
     try {
@@ -444,13 +425,9 @@ class BlockchainDataService {
         throw new Error("Invalid validators data format");
       }
 
-      // Giống Python: dùng float(group[1]) rồi convert sang int khi cần
-      // Python lưu float vào DataFrame, nhưng khi phân tích sẽ convert sang int
       const validators = Object.entries(groups)
         .map(([address, group]) => {
-          // Giống Python: dùng float trước
           const tokensFloat = parseFloat(group[1] || 0);
-          // Convert sang int (giống Python khi lưu CSV sẽ convert)
           return {
             address: address,
             tokens: Math.floor(tokensFloat),
@@ -468,7 +445,6 @@ class BlockchainDataService {
         timestamp: new Date().toISOString(),
       };
 
-      // Lưu CSV file
       this.saveToCSV(result);
 
       return result;
@@ -485,7 +461,7 @@ class BlockchainDataService {
   }
 
   /**
-   * Thu thập dữ liệu Axelar từ RPC API
+   * Collect Axelar data from RPC API
    */
   async fetchAxelarData() {
     try {
@@ -519,7 +495,6 @@ class BlockchainDataService {
         timestamp: new Date().toISOString(),
       };
 
-      // Lưu CSV file
       this.saveToCSV(result);
 
       return result;
@@ -560,7 +535,7 @@ class BlockchainDataService {
   }
 
   /**
-   * Thu thập dữ liệu từ tất cả chains
+   * Collect data from all chains
    */
   async fetchAllChainsData(selectedChains) {
     const chainsToFetch =
@@ -621,14 +596,13 @@ class BlockchainDataService {
       },
     };
 
-    // Lưu CSV files cho tất cả chains đã fetch thành công
     this.saveMultipleChainsToCSV(results);
 
     return result;
   }
 
   /**
-   * Lấy dữ liệu cho một chain cụ thể
+   * Get data for a specific chain
    */
   async fetchSingleChain(chainName) {
     if (!this.supportedChains.includes(chainName)) {
@@ -656,8 +630,8 @@ class BlockchainDataService {
   }
 
   /**
-   * Lưu dữ liệu chain thành CSV file
-   * @param {Object} chainData - Dữ liệu chain đã fetch
+   * Save chain data to CSV file
+   * @param {Object} chainData - Fetched chain data
    */
   saveToCSV(chainData) {
     try {
@@ -671,7 +645,6 @@ class BlockchainDataService {
           chainData.validators,
           chainData.timestamp
         );
-        // Thêm thông tin CSV vào response (optional)
         chainData.csv_file = {
           saved: true,
           filepath: filepath,
@@ -683,13 +656,12 @@ class BlockchainDataService {
         `Error saving CSV for ${chainData.blockchain}:`,
         error.message
       );
-      // Không throw error để không ảnh hưởng đến response chính
     }
   }
 
   /**
-   * Lưu nhiều chains data thành CSV files
-   * @param {Object} chainsData - Object chứa data của nhiều chains
+   * Save multiple chains data to CSV files
+   * @param {Object} chainsData - Object containing data of multiple chains
    */
   saveMultipleChainsToCSV(chainsData) {
     try {

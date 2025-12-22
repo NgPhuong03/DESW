@@ -51,7 +51,7 @@ def get_scheduled_sybil_attacks():
         print("\nScheduled Sybil Attacks:")
         for epoch, entity_id, num_splits in SCHEDULED_SYBIL_ATTACKS:
             print(
-                f"   • Epoch {epoch}: Entity {entity_id} sẽ split thành {num_splits} validators"
+                f"   • Epoch {epoch}: Entity {entity_id} will split into {num_splits} validators"
             )
         return SCHEDULED_SYBIL_ATTACKS
     else:
@@ -61,10 +61,10 @@ def get_scheduled_sybil_attacks():
 
 def calculate_reward_summary(detailed_peer_data):
     """
-    Tính tổng reward cho mỗi peer/validator từ detailed_peer_data
+    Calculate total reward for each peer/validator from detailed_peer_data
 
     Args:
-        detailed_peer_data: List of lists, mỗi inner list chứa dicts của peers tại một epoch
+        detailed_peer_data: List of lists, each inner list contains dicts of peers at one epoch
 
     Returns:
         Dictionary mapping validator_index -> {
@@ -85,21 +85,17 @@ def calculate_reward_summary(detailed_peer_data):
         }
     )
 
-    # Duyệt qua tất cả epochs
     for epoch_data in detailed_peer_data:
         for peer_data in epoch_data:
             validator_idx = peer_data["validator_index"]
 
-            # Cộng reward (có thể âm nếu bị penalty)
             reward_summary[validator_idx]["total_reward"] += peer_data[
                 "reward_received"
             ]
 
-            # Đếm số lần được chọn
             if peer_data["is_selected"]:
                 reward_summary[validator_idx]["times_selected"] += 1
 
-            # Lưu thông tin cuối cùng (epoch cuối sẽ ghi đè)
             reward_summary[validator_idx]["final_stake"] = peer_data["stake"]
             reward_summary[validator_idx]["entity_id"] = peer_data["entity_id"]
             reward_summary[validator_idx]["is_corrupted"] = peer_data["is_corrupted"]
@@ -109,13 +105,12 @@ def calculate_reward_summary(detailed_peer_data):
 
 def export_reward_summary(reward_summary, filename):
     """
-    Export tổng reward của từng peer ra file CSV
+    Export total reward of each peer to CSV file
 
     Args:
-        reward_summary: Dictionary từ calculate_reward_summary()
-        filename: Tên file CSV để lưu
+        reward_summary: Dictionary from calculate_reward_summary()
+        filename: CSV filename to save
     """
-    # Sắp xếp theo entity_id tăng dần
     sorted_rewards = sorted(reward_summary.items(), key=lambda x: x[1]["entity_id"])
 
     with open(filename, "w", newline="", encoding="utf-8") as csvfile:
@@ -142,15 +137,15 @@ def export_reward_summary(reward_summary, filename):
                 }
             )
 
-    print(f"\n✓ Đã export reward summary ra file: {filename}")
-    print(f"  - Tổng số peers: {len(sorted_rewards)}")
-    # Tìm peer có reward cao nhất
+    print(f"\n✓ Exported reward summary to file: {filename}")
+    print(f"  - Total number of peers: {len(sorted_rewards)}")
     highest_reward_peer = max(sorted_rewards, key=lambda x: x[1]["total_reward"])
     print(
-        f"  - Peer có reward cao nhất: Validator {highest_reward_peer[0]} (Entity {highest_reward_peer[1]['entity_id']}) với {highest_reward_peer[1]['total_reward']:.2f}"
+        f"  - Peer with highest reward: Validator {highest_reward_peer[0]} (Entity {highest_reward_peer[1]['entity_id']}) with {highest_reward_peer[1]['total_reward']:.2f}"
     )
+    most_selected_peer = max(sorted_rewards, key=lambda x: x[1]["times_selected"])
     print(
-        f"  - Peer được chọn nhiều nhất: Validator {max(sorted_rewards, key=lambda x: x[1]['times_selected'])[0]} với {max(sorted_rewards, key=lambda x: x[1]['times_selected'])[1]['times_selected']} lần"
+        f"  - Peer selected most frequently: Validator {most_selected_peer[0]} with {most_selected_peer[1]['times_selected']} times"
     )
 
 
@@ -160,7 +155,6 @@ def run_single_experiment(
     """Run a single experiment with the specified PoS algorithm"""
     print(f"Running {experiment_name}")
 
-    # Common parameters
     params = Parameters(
         n_epochs=10000,
         proof_of_stake=pos_algorithm,
@@ -177,7 +171,6 @@ def run_single_experiment(
         scheduled_joins=scheduled_joins,
     )
 
-    # Generate initial stakes
     stakes = generate_peers(
         params.n_peers,
         params.initial_stake_volume,
@@ -185,16 +178,13 @@ def run_single_experiment(
         starting_gini,
     )
 
-    # Create corrupted peers
     corrupted = random.sample(range(params.n_peers), params.n_corrupted)
 
     print(f"  Initial Gini: {gini(stakes):.3f}")
     print(f"  Peers: {len(stakes)}, Corrupted: {len(corrupted)}")
 
-    # Create filename for plots and exports
     filename = experiment_name.lower().replace(" ", "_").replace(":", "")
 
-    # Run simulation with detailed tracking to capture rewards
     print("  Running simulation with detailed tracking...")
     (
         gini_history,
@@ -215,7 +205,6 @@ def run_single_experiment(
         detailed_peer_data,
     ) = simulate_with_detailed_tracking(stakes.copy(), corrupted.copy(), params)
 
-    # Calculate average values
     avg_gini = np.mean(gini_history) if gini_history else 0
     avg_nakamoto = np.mean(nakamoto_history) if nakamoto_history else 0
     avg_peers = np.mean(peers_history) if peers_history else 0
@@ -258,18 +247,15 @@ def run_single_experiment(
     print(f"  Final Peers: {peers_history[-1]} (Avg: {avg_peers:.2f})")
     print(f"  Final HHI: {hhi_history[-1]:.3f} (Avg: {avg_hhi:.3f})")
 
-    # Calculate reward summary for each peer
     print("  Calculating reward summary...")
     reward_summary = calculate_reward_summary(detailed_peer_data)
 
-    # Export reward summary to CSV
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     reward_csv_filename = f"{filename}_rewards_{timestamp}.csv"
     reward_csv_path = os.path.join("results", reward_csv_filename)
     os.makedirs("results", exist_ok=True)
     export_reward_summary(reward_summary, reward_csv_path)
 
-    # Plot 1: Gini Coefficient
     plt.figure(figsize=(12, 8))
     plt.plot(gini_history, linewidth=2, color="blue", alpha=0.8)
     plt.title(f"{experiment_name} - Gini Coefficient", fontsize=16, fontweight="bold")
@@ -280,7 +266,6 @@ def run_single_experiment(
     save_plot("", f"{filename}_gini.png", " Gini")
     plt.show()
 
-    # Plot 2: Nakamoto Coefficient
     plt.figure(figsize=(12, 8))
     plt.plot(nakamoto_history, linewidth=2, color="red", alpha=0.8)
     plt.title(
@@ -293,7 +278,6 @@ def run_single_experiment(
     save_plot("", f"{filename}_nakamoto.png", " Nakamoto")
     plt.show()
 
-    # Plot 3: Peers Count
     plt.figure(figsize=(12, 8))
     plt.plot(peers_history, linewidth=2, color="green", alpha=0.8)
     plt.title(f"{experiment_name} - Peers Count", fontsize=16, fontweight="bold")
@@ -302,9 +286,7 @@ def run_single_experiment(
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
     save_plot("", f"{filename}_peers.png", " Peers Count")
-    # plt.show()
 
-    # Plot 4: HHI Coefficient
     plt.figure(figsize=(12, 8))
     plt.plot(hhi_history, linewidth=2, color="orange", alpha=0.8)
     plt.title(f"{experiment_name} - HHI Coefficient", fontsize=16, fontweight="bold")
@@ -315,7 +297,6 @@ def run_single_experiment(
     save_plot("", f"{filename}_hhi.png", " HHI Coefficient")
     plt.show()
 
-    # Save data
     result = {
         "gini_history": gini_history,
         "nakamoto_history": nakamoto_history,
@@ -345,7 +326,6 @@ def run_single_experiment(
         "shapley_gini_safety_history": shapley_gini_safety_history,
         "shapley_gini_correlation_history": shapley_gini_correlation_history,
     }
-    # Convert to format compatible with experiment_utils
     results_for_save = {
         "experiment_result": {
             "starting_gini": result["starting_gini"],
@@ -425,13 +405,9 @@ def run_comparison_experiment():
     print("Compare all 6 PoS algorithms")
     print("=" * 50)
 
-    # Ask for scheduled joins for this experiment
     scheduled_joins = get_scheduled_joins()
-
-    # Display scheduled Sybil attacks
     get_scheduled_sybil_attacks()
 
-    # Common parameters for all algorithms
     base_params = {
         "n_epochs": 20000,
         "initial_stake_volume": 5000.0,
@@ -462,7 +438,6 @@ def run_comparison_experiment():
     print(f"Number of corrupted peers: {len(corrupted)}")
     print()
 
-    # Dictionary to store results for each algorithm
     algorithms = {
         "WEIGHTED": PoS.WEIGHTED,
         # "OPPOSITE_WEIGHTED": PoS.OPPOSITE_WEIGHTED,
@@ -482,11 +457,9 @@ def run_comparison_experiment():
         "SRSW_WEIGHTED": "orange",
     }
 
-    # Run simulation for each algorithm
     for name, pos_type in algorithms.items():
         print(f"Running {name} simulation...")
 
-        # Create a copy of base_params and remove keys that will be overridden
         params_dict = {
             k: v
             for k, v in base_params.items()
@@ -497,7 +470,6 @@ def run_comparison_experiment():
         )
         stakes = stakes_original.copy()
 
-        # Use detailed tracking to capture rewards
         (
             gini_history,
             peers_history,
@@ -517,10 +489,8 @@ def run_comparison_experiment():
             detailed_peer_data,
         ) = simulate_with_detailed_tracking(stakes.copy(), corrupted.copy(), params)
 
-        # Calculate reward summary
         reward_summary = calculate_reward_summary(detailed_peer_data)
 
-        # Calculate average values
         n_epochs = len(gini_history)
         avg_gini = np.mean(gini_history) if gini_history else 0
         avg_nakamoto = np.mean(nakamoto_history) if nakamoto_history else 0
@@ -598,14 +568,12 @@ def run_comparison_experiment():
         print(f"  Final Peers: {peers_history[-1]} (Avg: {avg_peers:.2f})")
         print(f"  Final HHI: {hhi_history[-1]:.3f} (Avg: {avg_hhi:.3f})")
 
-        # Export reward summary for this algorithm
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         reward_csv_filename = f"comparison_{name.lower()}_rewards_{timestamp}.csv"
         reward_csv_path = os.path.join("results", reward_csv_filename)
         os.makedirs("results", exist_ok=True)
         export_reward_summary(reward_summary, reward_csv_path)
 
-    # Plot 1: Gini Coefficient Comparison
     plt.figure(figsize=(12, 8))
     for name, result in results.items():
         plt.plot(
@@ -629,7 +597,6 @@ def run_comparison_experiment():
     save_plot("", "gini_comparison.png", " Gini")
     plt.show()
 
-    # Plot 2: Nakamoto Coefficient Comparison
     plt.figure(figsize=(12, 8))
     for name, result in results.items():
         plt.plot(
@@ -653,7 +620,6 @@ def run_comparison_experiment():
     save_plot("", "nakamoto_comparison.png", " Nakamoto")
     plt.show()
 
-    # Detailed stats - Final values
     print("\nFINAL COMPARISON RESULTS:")
     print("-" * 70)
     print(
@@ -666,7 +632,6 @@ def run_comparison_experiment():
             f"{name:<20} {result['final_gini']:<12.3f} {result['final_nakamoto']:<15} {result['final_peers']:<12} {result['final_hhi']:<12.3f}"
         )
 
-    # Average values
     print("\nAVERAGE COMPARISON RESULTS (across all epochs):")
     print("-" * 70)
     print(
@@ -679,7 +644,6 @@ def run_comparison_experiment():
             f"{name:<20} {result['avg_gini']:<12.3f} {result['avg_nakamoto']:<15.2f} {result['avg_peers']:<12.2f} {result['avg_hhi']:<12.3f}"
         )
 
-    # Save data
     save_results_to_json(results, "all_pos_comparison_data.json", "")
 
     print("\nComparison completed!")
@@ -691,7 +655,6 @@ def main():
     print("PoS Simulator - Compare 6 Proof-of-Stake Algorithms")
     print("=" * 60)
 
-    # Set random seed for reproducibility
     random.seed(42)
     np.random.seed(42)
 
@@ -709,7 +672,7 @@ def main():
             print("7. Compare all 6 algorithms")
             print("8. Exit")
 
-            choice = input("\nEnter choice (1-9): ").strip()
+            choice = input("\nEnter choice (1-8): ").strip()
 
             if choice == "1":
                 print("\n" + "=" * 60)

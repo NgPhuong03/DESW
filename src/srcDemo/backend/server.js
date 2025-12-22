@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 5000;
 app.use(helmet());
 app.use(compression());
 
-// Rate limiting - chỉ bật trong production để tránh ảnh hưởng dev / frontend polling
+// Rate limiting - only enabled in production to avoid affecting dev / frontend polling
 if (process.env.NODE_ENV === "production") {
   const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes

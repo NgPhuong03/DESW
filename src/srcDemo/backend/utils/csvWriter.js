@@ -1,7 +1,7 @@
 /**
  * CSV Writer Utility
  *
- * Utility để convert và lưu dữ liệu validators thành CSV files
+ * Utility to convert and save validator data to CSV files
  */
 
 const fs = require("fs");
@@ -9,13 +9,12 @@ const path = require("path");
 
 class CSVWriter {
   constructor() {
-    // Tạo thư mục data/csv nếu chưa tồn tại
     this.csvDir = path.join(__dirname, "..", "data", "csv");
     this.ensureDirectoryExists(this.csvDir);
   }
 
   /**
-   * Đảm bảo thư mục tồn tại
+   * Ensure directory exists
    */
   ensureDirectoryExists(dirPath) {
     if (!fs.existsSync(dirPath)) {
@@ -24,23 +23,21 @@ class CSVWriter {
   }
 
   /**
-   * Escape CSV field nếu cần (nếu có dấu phẩy, dấu ngoặc kép, hoặc xuống dòng)
+   * Escape CSV field if needed (if contains comma, quotes, or newline)
    */
   escapeCSVField(field) {
     if (field === null || field === undefined) {
       return "";
     }
     const str = String(field);
-    // Nếu có dấu phẩy, dấu ngoặc kép, hoặc xuống dòng thì cần wrap trong dấu ngoặc kép
     if (str.includes(",") || str.includes('"') || str.includes("\n")) {
-      // Escape dấu ngoặc kép bằng cách double nó
       return `"${str.replace(/"/g, '""')}"`;
     }
     return str;
   }
 
   /**
-   * Convert validators data thành CSV format
+   * Convert validators data to CSV format
    */
   convertToCSV(validators, includeHeaders = true) {
     if (!Array.isArray(validators) || validators.length === 0) {
@@ -65,11 +62,11 @@ class CSVWriter {
   }
 
   /**
-   * Lưu validators data thành CSV file
-   * @param {string} chainName - Tên blockchain
-   * @param {Array} validators - Mảng validators
-   * @param {string} timestamp - Timestamp (optional, sẽ tự tạo nếu không có)
-   * @returns {string} - Đường dẫn file đã lưu
+   * Save validators data to CSV file
+   * @param {string} chainName - Blockchain name
+   * @param {Array} validators - Array of validators
+   * @param {string} timestamp - Timestamp (optional, will be auto-generated if not provided)
+   * @returns {string} - Path to saved file
    */
   saveValidatorsToCSV(chainName, validators, timestamp = null) {
     try {
@@ -77,18 +74,14 @@ class CSVWriter {
         throw new Error("Invalid validators data: must be a non-empty array");
       }
 
-      // Tạo timestamp nếu chưa có
       const ts = timestamp || new Date().toISOString();
-      // Format timestamp thành filename-friendly format: YYYYMMDD_HHMMSS
       const date = new Date(ts);
-      const dateStr = date.toISOString().replace(/[-:]/g, "").split(".")[0]; // YYYYMMDDTHHMMSS
-      const formattedDate = dateStr.replace("T", "_"); // YYYYMMDD_HHMMSS
+      const dateStr = date.toISOString().replace(/[-:]/g, "").split(".")[0];
+      const formattedDate = dateStr.replace("T", "_");
 
-      // Tạo filename: {chainName}_{timestamp}.csv
       const filename = `${chainName}_${formattedDate}.csv`;
       const filepath = path.join(this.csvDir, filename);
 
-      // Convert và lưu CSV
       const csvContent = this.convertToCSV(validators, true);
       fs.writeFileSync(filepath, csvContent, "utf8");
 
@@ -104,9 +97,9 @@ class CSVWriter {
   }
 
   /**
-   * Lưu nhiều chains data thành các CSV files riêng biệt
-   * @param {Object} chainsData - Object chứa data của nhiều chains
-   * @returns {Object} - Object chứa file paths đã lưu
+   * Save multiple chains data to separate CSV files
+   * @param {Object} chainsData - Object containing data of multiple chains
+   * @returns {Object} - Object containing saved file paths
    */
   saveMultipleChainsToCSV(chainsData) {
     const savedFiles = {};
@@ -147,9 +140,9 @@ class CSVWriter {
   }
 
   /**
-   * Lấy danh sách CSV files đã lưu
-   * @param {string} chainName - Filter theo chain name (optional)
-   * @returns {Array} - Mảng các file info
+   * Get list of saved CSV files
+   * @param {string} chainName - Filter by chain name (optional)
+   * @returns {Array} - Array of file info
    */
   listCSVFiles(chainName = null) {
     try {
@@ -187,9 +180,9 @@ class CSVWriter {
   }
 
   /**
-   * Đọc CSV file và trả về data
-   * @param {string} filename - Tên file CSV
-   * @returns {Array} - Mảng validators
+   * Read CSV file and return data
+   * @param {string} filename - CSV filename
+   * @returns {Array} - Array of validators
    */
   readCSVFile(filename) {
     try {
@@ -202,16 +195,14 @@ class CSVWriter {
       const lines = content.split("\n").filter((line) => line.trim() !== "");
 
       if (lines.length < 2) {
-        return []; // Chỉ có header hoặc empty
+        return [];
       }
 
-      // Skip header
       const validators = [];
       for (let i = 1; i < lines.length; i++) {
         const line = lines[i].trim();
         if (!line) continue;
 
-        // Parse CSV line (xử lý đơn giản, có thể cần cải thiện nếu có edge cases)
         const parts = line.split(",");
         if (parts.length >= 2) {
           const address = parts[0].replace(/^"|"$/g, ""); // Remove quotes if any

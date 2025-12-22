@@ -66,7 +66,7 @@ class Parameters:
     θ: float = 0.3  # theta - target Gini coefficient
     s_type: SType = SType.LINEAR
     k: float = 0.001
-    reward: float = 10.0  # Base reward (cho constant) hoặc total reward (cho dynamic)
+    reward: float = 10.0  # Base reward (for constant) or total reward (for dynamic)
     use_dynamic_reward: bool = True  # True = dynamic reward, False = constant reward
     scheduled_joins: Optional[List[Tuple[int, float]]] = (
         None  # [(epoch, stake_amount), ...]

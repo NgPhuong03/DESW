@@ -208,7 +208,6 @@ const ParameterForm = ({
         </div>
       )}
 
-      {/* Cards layout – xếp ngang trên màn hình lớn */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Basic Parameters */}
         <div className="card">

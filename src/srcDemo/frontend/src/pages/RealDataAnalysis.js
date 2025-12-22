@@ -214,7 +214,6 @@ const RealDataAnalysis = () => {
     );
   };
 
-  // Hàm chuyển đổi dữ liệu validators thành CSV
   const convertValidatorsToCSV = (validators, chainName) => {
     if (!validators || validators.length === 0) {
       return "";
@@ -226,41 +225,38 @@ const RealDataAnalysis = () => {
 
     // Data rows
     validators.forEach((validator) => {
-      const row = [
-        validator.address || "",
-        validator.tokens || 0,
-      ];
+      const row = [validator.address || "", validator.tokens || 0];
       // Escape commas and quotes in CSV
       csvRows.push(
-        row.map((field) => {
-          const str = String(field);
-          if (str.includes(",") || str.includes('"') || str.includes("\n")) {
-            return `"${str.replace(/"/g, '""')}"`;
-          }
-          return str;
-        }).join(",")
+        row
+          .map((field) => {
+            const str = String(field);
+            if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+              return `"${str.replace(/"/g, '""')}"`;
+            }
+            return str;
+          })
+          .join(",")
       );
     });
 
     return csvRows.join("\n");
   };
 
-  // Hàm download CSV cho một chain
   const downloadChainCSV = (chainName) => {
     if (!collectionResult) {
-      toast.error("Không có dữ liệu để tải xuống");
+      toast.error("No data available to download");
       return;
     }
 
-    // Tìm dữ liệu validators cho chain này
     let validators = null;
 
-    // Nếu là single chain result
-    if (collectionResult.validators && collectionResult.blockchain === chainName) {
+    if (
+      collectionResult.validators &&
+      collectionResult.blockchain === chainName
+    ) {
       validators = collectionResult.validators;
-    }
-    // Nếu là multiple chains result
-    else if (collectionResult.chains && collectionResult.chains[chainName]) {
+    } else if (collectionResult.chains && collectionResult.chains[chainName]) {
       const chainData = collectionResult.chains[chainName];
       if (chainData.success && chainData.validators) {
         validators = chainData.validators;
@@ -268,30 +264,27 @@ const RealDataAnalysis = () => {
     }
 
     if (!validators || validators.length === 0) {
-      toast.error(`Không tìm thấy dữ liệu validators cho ${chainName}`);
+      toast.error(`No validator data found for ${chainName}`);
       return;
     }
 
-    // Tạo CSV content
     const csvContent = convertValidatorsToCSV(validators, chainName);
-    
-    // Tạo blob và download
+
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
-    
-    // Tạo tên file với timestamp
+
     const timestamp = new Date().toISOString().split("T")[0].replace(/-/g, "");
     const filename = `${timestamp}_${chainName}_validators.csv`;
-    
+
     link.setAttribute("href", url);
     link.setAttribute("download", filename);
     link.style.visibility = "hidden";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
-    toast.success(`Đã tải xuống CSV cho ${chainName}`);
+
+    toast.success(`Downloaded CSV for ${chainName}`);
   };
 
   const renderDetailedResults = () => {
@@ -324,7 +317,7 @@ const RealDataAnalysis = () => {
                     <button
                       onClick={() => downloadChainCSV(chainName)}
                       className="px-3 py-1.5 text-xs bg-green-600 hover:bg-green-700 text-white rounded font-medium flex items-center gap-1"
-                      title="Tải xuống dữ liệu validators dạng CSV"
+                      title="Download validator data as CSV"
                     >
                       <svg
                         className="w-4 h-4"

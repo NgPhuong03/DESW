@@ -95,7 +95,7 @@ const Results = () => {
       }
 
       setLoading(false);
-      return true; // Trả về true nếu fetch thành công
+      return true;
     } catch (err) {
       console.error("Error fetching simulation:", err);
 
@@ -103,8 +103,6 @@ const Results = () => {
         setError("Simulation not found");
         setLoading(false);
       } else if (err.response?.status === 400) {
-        // Simulation chưa completed - không set error ở đây
-        // Sẽ được xử lý bởi caller
       } else {
         setError("Something went wrong while loading results");
         setLoading(false);
@@ -112,7 +110,7 @@ const Results = () => {
     } finally {
       setRefreshing(false);
     }
-    return false; // Trả về false nếu fetch thất bại
+    return false;
   };
 
   const checkStatus = async () => {
@@ -166,16 +164,11 @@ const Results = () => {
     });
     setNow(Date.now());
 
-    // Thử fetch results trực tiếp trước (cho simulation đã completed)
-    // Nếu thành công → hiển thị results ngay, không cần polling
-    // Nếu fail với 400 (chưa completed) → mới bắt đầu polling status
     const tryFetchFirst = async () => {
       const success = await fetchSimulation(false);
       if (!success) {
-        // Simulation chưa completed hoặc có lỗi, bắt đầu polling status
         checkStatus();
       }
-      // Nếu success === true, fetchSimulation đã tự set loading = false và hiển thị results
     };
 
     tryFetchFirst();

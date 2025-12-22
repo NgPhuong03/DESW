@@ -117,7 +117,7 @@ Before setting up the project, ensure you have the following installed:
 
    ```bash
    git clone <repository-url>
-   cd NewGit
+   cd DESW
    ```
 
 2. **Install PoS Simulator Dependencies**
@@ -383,32 +383,34 @@ DESW/
 │   │   ├── src/                   # Core simulator modules
 │   │   │   ├── simulator.py       # Main simulation engine
 │   │   │   ├── parameters.py      # Parameter definitions
-│   │   │   ├── utils.py          # Utility functions and metrics
+│   │   │   ├── utils.py           # Utility functions and metrics
 │   │   │   └── ...
-│   │   ├── experiments/          # Experiment scripts
-│   │   ├── benchmark/            # Benchmarking tools
-│   │   └── requirements.txt      # Python dependencies
-│   ├── RealWorld-Analysis/       # Real-world blockchain analysis
-│   │   ├── chains/               # Blockchain-specific modules
-│   │   ├── analysis/             # Metrics calculation modules
-│   │   ├── data/                 # Validator data storage
-│   │   ├── results/              # Analysis results and visualizations
-│   │   └── main.py               # Main analysis script
-│   ├── srcDemo/                  # PoS-Analyzer web application
+│   │   ├── experiments/           # Experiment scripts
+│   │   ├── benchmark/             # Benchmarking tools
+│   │   └── requirements.txt       # Python dependencies
+│   ├── RealWorld-Analysis/        # Real-world blockchain analysis
+│   │   ├── chains/                # Blockchain-specific modules
+│   │   ├── analysis/              # Metrics calculation modules
+│   │   ├── data/                  # Validator data storage
+│   │   ├── results/               # Analysis results and visualizations
+│   │   └── main.py                # Get data
+│   ├── srcDemo/                   # PoS-Analyzer web application
 │   │   ├── backend/               # Node.js backend API
-│   │   │   ├── controllers/      # API controllers
-│   │   │   ├── models/           # Data models
-│   │   │   ├── routes/           # API routes
-│   │   │   ├── services/         # Business logic
+│   │   │   ├── controllers/       # API controllers
+│   │   │   ├── models/            # Data models
+│   │   │   ├── routes/            # API routes
+│   │   │   ├── services/          # Business logic
 │   │   │   └── server.js          # Server entry point
-│   │   └── frontend/             # React frontend
-│   │       ├── src/              # React components
-│   │       └── public/           # Static assets
-│   └── eth-testnet/              # Ethereum testnet implementation
-│       ├── lighthouses/          # Lighthouse client variants
-│       ├── doras/                # Dora explorer variants
-│       ├── params/               # Testnet configuration files
-│       └── run_network.sh        # Network orchestration script
+│   │   └── frontend/              # React frontend
+│   │       ├── src/               # React components
+│   │       └── public/            # Static assets
+│   └── eth-testnet/               # Ethereum testnet implementation
+│       ├── lighthouses/           # Lighthouse client variants
+│       ├── doras/                 # Dora explorer variants
+│       ├── params/                # Testnet configuration files
+│       ├── build_lighthouses.sh   # Build Docker images for Lighthouse consensus clients
+│       ├── build_doras.sh         # Build Docker images for Dora blockchain explorers
+│       └── run_network.sh         # Network orchestration script
 ├── README.md                      # Main documentation
 └── .gitignore                     # Git ignore patterns
 ```

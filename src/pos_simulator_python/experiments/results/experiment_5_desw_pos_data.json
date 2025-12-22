@@ -1,9 +1,0 @@
-{
-  "experiment_result": {
-    "starting_gini": 0.3,
-    "final_gini": 0.42220686481412495,
-    "final_nakamoto": 255,
-    "final_peers": 1004,
-    "final_hhi": 0.001553219184985934
-  }
-}

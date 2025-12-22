@@ -87,16 +87,12 @@ def run_weighted_experiment(starting_gini=0.3, n_epochs=20000):
         stakes.copy(), corrupted.copy(), params, compute_shapley=False
     )
 
-    # Lưu kết quả vào CSV - chỉ các metrics cần thiết
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-    # Tạo thư mục results nếu chưa có (lưu trực tiếp vào results/, không có subfolder)
     results_dir = os.path.join(os.path.dirname(__file__), "..", "results")
     os.makedirs(results_dir, exist_ok=True)
 
     csv_filename = os.path.join(results_dir, f"weighted_results_{timestamp}.csv")
-
-    # Ghi dữ liệu vào CSV
     with open(csv_filename, "w", newline="", encoding="utf-8") as csvfile:
         fieldnames = [
             "epoch",
@@ -123,7 +119,7 @@ def run_weighted_experiment(starting_gini=0.3, n_epochs=20000):
                 }
             )
 
-    print(f"✓ Đã lưu kết quả vào: {csv_filename}")
+    print(f"✓ Saved results to: {csv_filename}")
     print(f"  Final Gini: {gini_history[-1]:.4f}")
     print(f"  Final Nakamoto: {nakamoto_history[-1]}")
     print(f"  Final Nakamoto Liveness: {nakamoto_liveness_history[-1]}")
@@ -131,7 +127,6 @@ def run_weighted_experiment(starting_gini=0.3, n_epochs=20000):
     print(f"  Final HHI: {hhi_history[-1]:.4f}")
     print(f"  Final Zipf: {zipf_history[-1]:.4f}")
 
-    # Vẽ và lưu biểu đồ
     base_filename = f"weighted_{timestamp}"
 
     # Plot 1: Gini Coefficient
@@ -145,9 +140,7 @@ def run_weighted_experiment(starting_gini=0.3, n_epochs=20000):
     gini_plot_path = os.path.join(results_dir, f"{base_filename}_gini.png")
     plt.savefig(gini_plot_path, dpi=300, bbox_inches="tight")
     plt.close()
-    print(f"✓ Đã lưu biểu đồ Gini: {gini_plot_path}")
-
-    # Plot 2: Nakamoto Coefficient (Overall)
+    print(f"✓ Saved Gini plot: {gini_plot_path}")
     plt.figure(figsize=(12, 8))
     plt.plot(nakamoto_history, linewidth=2, color="red", alpha=0.8)
     plt.title("WEIGHTED PoS - Nakamoto Coefficient", fontsize=16, fontweight="bold")
@@ -158,9 +151,7 @@ def run_weighted_experiment(starting_gini=0.3, n_epochs=20000):
     nakamoto_plot_path = os.path.join(results_dir, f"{base_filename}_nakamoto.png")
     plt.savefig(nakamoto_plot_path, dpi=300, bbox_inches="tight")
     plt.close()
-    print(f"✓ Đã lưu biểu đồ Nakamoto: {nakamoto_plot_path}")
-
-    # Plot 3: Nakamoto Liveness
+    print(f"✓ Saved Nakamoto plot: {nakamoto_plot_path}")
     plt.figure(figsize=(12, 8))
     plt.plot(nakamoto_liveness_history, linewidth=2, color="green", alpha=0.8)
     plt.title("WEIGHTED PoS - Nakamoto Liveness", fontsize=16, fontweight="bold")
@@ -173,9 +164,7 @@ def run_weighted_experiment(starting_gini=0.3, n_epochs=20000):
     )
     plt.savefig(liveness_plot_path, dpi=300, bbox_inches="tight")
     plt.close()
-    print(f"✓ Đã lưu biểu đồ Nakamoto Liveness: {liveness_plot_path}")
-
-    # Plot 4: Nakamoto Safety
+    print(f"✓ Saved Nakamoto Liveness plot: {liveness_plot_path}")
     plt.figure(figsize=(12, 8))
     plt.plot(nakamoto_safety_history, linewidth=2, color="purple", alpha=0.8)
     plt.title("WEIGHTED PoS - Nakamoto Safety", fontsize=16, fontweight="bold")
@@ -186,9 +175,7 @@ def run_weighted_experiment(starting_gini=0.3, n_epochs=20000):
     safety_plot_path = os.path.join(results_dir, f"{base_filename}_nakamoto_safety.png")
     plt.savefig(safety_plot_path, dpi=300, bbox_inches="tight")
     plt.close()
-    print(f"✓ Đã lưu biểu đồ Nakamoto Safety: {safety_plot_path}")
-
-    # Plot 5: HHI
+    print(f"✓ Saved Nakamoto Safety plot: {safety_plot_path}")
     plt.figure(figsize=(12, 8))
     plt.plot(hhi_history, linewidth=2, color="orange", alpha=0.8)
     plt.title("WEIGHTED PoS - HHI Coefficient", fontsize=16, fontweight="bold")
@@ -199,9 +186,7 @@ def run_weighted_experiment(starting_gini=0.3, n_epochs=20000):
     hhi_plot_path = os.path.join(results_dir, f"{base_filename}_hhi.png")
     plt.savefig(hhi_plot_path, dpi=300, bbox_inches="tight")
     plt.close()
-    print(f"✓ Đã lưu biểu đồ HHI: {hhi_plot_path}")
-
-    # Plot 6: Zipf
+    print(f"✓ Saved HHI plot: {hhi_plot_path}")
     plt.figure(figsize=(12, 8))
     plt.plot(zipf_history, linewidth=2, color="brown", alpha=0.8)
     plt.title("WEIGHTED PoS - Zipf Coefficient", fontsize=16, fontweight="bold")
@@ -212,7 +197,7 @@ def run_weighted_experiment(starting_gini=0.3, n_epochs=20000):
     zipf_plot_path = os.path.join(results_dir, f"{base_filename}_zipf.png")
     plt.savefig(zipf_plot_path, dpi=300, bbox_inches="tight")
     plt.close()
-    print(f"✓ Đã lưu biểu đồ Zipf: {zipf_plot_path}")
+    print(f"✓ Saved Zipf plot: {zipf_plot_path}")
 
     return {
         "csv_file": csv_filename,

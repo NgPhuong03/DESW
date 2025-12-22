@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Phân tích các chỉ số decentralization từ file CSV
-Tính toán tất cả các chỉ số và lưu kết quả vào CSV
+Analyze decentralization metrics from CSV file
+Calculate all metrics and save results to CSV
 """
 
 import pandas as pd
@@ -10,7 +10,6 @@ import os
 import sys
 from datetime import datetime
 
-# Import các hàm tính toán chỉ số
 from coefficient import (
     calculate_gini_coefficient,
     calculate_nakamoto_coefficient,
@@ -35,80 +34,68 @@ def analyze_csv_file(
     exclude_unidentified=False,
 ):
     """
-    Phân tích file CSV và tính toán tất cả các chỉ số decentralization
+    Analyze CSV file and calculate all decentralization metrics
 
     Args:
-        csv_path: Đường dẫn đến file CSV
-        col: Tên cột chứa stake values (mặc định 'tokens')
-        output_dir: Thư mục để lưu kết quả (mặc định: cùng thư mục với CSV)
-        calculate_shapley: Có tính Shapley Gini không (tính toán chậm)
-        shapley_samples: Số samples cho Shapley Gini (mặc định 1000)
-        exclude_unidentified: Có loại bỏ các dòng có address là "Unidentified" không
+        csv_path: Path to CSV file
+        col: Column name containing stake values (default 'tokens')
+        output_dir: Directory to save results (default: same directory as CSV)
+        calculate_shapley: Whether to calculate Shapley Gini (slow computation)
+        shapley_samples: Number of samples for Shapley Gini (default 1000)
+        exclude_unidentified: Whether to remove rows with address "Unidentified"
 
     Returns:
-        Dictionary chứa tất cả các chỉ số đã tính
+        Dictionary containing all calculated metrics
     """
-    print("=" * 70)
-    print("PHÂN TÍCH CÁC CHỈ SỐ DECENTRALIZATION")
-    print("=" * 70)
+    print("ANALYZING DECENTRALIZATION METRICS")
 
-    # Đọc file CSV
     if not os.path.exists(csv_path):
-        raise FileNotFoundError(f"Không tìm thấy file: {csv_path}")
+        raise FileNotFoundError(f"File not found: {csv_path}")
 
-    print(f"\nĐang đọc file: {csv_path}")
+    print(f"\nReading file: {csv_path}")
     df = pd.read_csv(csv_path)
 
-    # Kiểm tra cột tồn tại
     if col not in df.columns:
-        raise ValueError(f"Cột '{col}' không tồn tại trong file CSV")
+        raise ValueError(f"Column '{col}' does not exist in CSV file")
 
-    # Lọc bỏ các giá trị 0, NaN, hoặc âm
-    # Đầu tiên fill NaN bằng 0, sau đó lọc các giá trị > 0
     df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
     df_clean = df[df[col] > 0].copy()
 
-    # Lọc bỏ các dòng có address là "Unidentified" nếu flag được bật
     if exclude_unidentified and "address" in df_clean.columns:
         before_unidentified_filter = len(df_clean)
         df_clean = df_clean[df_clean["address"] != "Unidentified"].copy()
         unidentified_count = before_unidentified_filter - len(df_clean)
         if unidentified_count > 0:
             print(
-                f"  - Đã loại bỏ: {unidentified_count} validators có address = 'Unidentified'"
+                f"  - Removed: {unidentified_count} validators with address = 'Unidentified'"
             )
 
-    # Đếm số dòng bị loại bỏ
     removed_count = len(df) - len(df_clean)
 
-    print(f"  - Tổng số validators: {len(df)}")
-    print(f"  - Validators có stake > 0: {len(df_clean)}")
+    print(f"  - Total validators: {len(df)}")
+    print(f"  - Validators with stake > 0: {len(df_clean)}")
     if removed_count > 0:
-        print(f"  - Đã loại bỏ: {removed_count} validators (stake = 0 hoặc NaN)")
-    print(f"  - Tổng stake: {df_clean[col].sum():,.0f}")
-    print(f"  - Stake trung bình: {df_clean[col].mean():,.2f}")
-    print(f"  - Stake lớn nhất: {df_clean[col].max():,.0f}")
-    print(f"  - Stake nhỏ nhất: {df_clean[col].min():,.0f}")
+        print(f"  - Removed: {removed_count} validators (stake = 0 or NaN)")
+    print(f"  - Total stake: {df_clean[col].sum():,.0f}")
+    print(f"  - Mean stake: {df_clean[col].mean():,.2f}")
+    print(f"  - Max stake: {df_clean[col].max():,.0f}")
+    print(f"  - Min stake: {df_clean[col].min():,.0f}")
 
-    # Tính toán các chỉ số
-    print(f"\nĐang tính toán các chỉ số...")
+    print(f"\nCalculating metrics...")
 
     results = {}
 
-    # 1. Gini Coefficient
-    print("  - Tính Gini Coefficient...")
+    print("  - Calculating Gini Coefficient...")
     gini = calculate_gini_coefficient(df_clean, col)
     results["gini"] = gini
     print(f"    Gini: {gini:.4f}")
 
-    # 2. Nakamoto Coefficient (50% threshold)
-    print("  - Tính Nakamoto Coefficient (50%)...")
+    print("  - Calculating Nakamoto Coefficient (50%)...")
     nakamoto = calculate_nakamoto_coefficient(df_clean, col)
     results["nakamoto"] = nakamoto
     print(f"    Nakamoto (50%): {nakamoto}")
 
-    # 2b. Nakamoto Coefficient Liveness (33% threshold)
-    print("  - Tính Nakamoto Coefficient Liveness (33%)...")
+    print("  - Calculating Nakamoto Coefficient Liveness (33%)...")
     nakamoto_liveness, nakamoto_liveness_pct = calculate_nakamoto_coefficient_liveness(
         df_clean, col
     )
@@ -116,8 +103,7 @@ def analyze_csv_file(
     results["nakamoto_liveness_percentage"] = nakamoto_liveness_pct
     print(f"    Nakamoto Liveness: {nakamoto_liveness} ({nakamoto_liveness_pct}%)")
 
-    # 2c. Nakamoto Coefficient Safety (66% threshold)
-    print("  - Tính Nakamoto Coefficient Safety (66%)...")
+    print("  - Calculating Nakamoto Coefficient Safety (66%)...")
     nakamoto_safety, nakamoto_safety_pct = calculate_nakamoto_coefficient_safety(
         df_clean, col
     )
@@ -125,28 +111,24 @@ def analyze_csv_file(
     results["nakamoto_safety_percentage"] = nakamoto_safety_pct
     print(f"    Nakamoto Safety: {nakamoto_safety} ({nakamoto_safety_pct}%)")
 
-    # 3. HHI Coefficient
-    print("  - Tính HHI Coefficient...")
+    print("  - Calculating HHI Coefficient...")
     hhi = calculate_hhi_coefficient(df_clean, col, normalize=False)
     hhi_normalized = calculate_hhi_coefficient(df_clean, col, normalize=True)
     results["hhi"] = hhi
     results["hhi_normalized"] = hhi_normalized
     print(f"    HHI: {hhi:.4f} (Normalized: {hhi_normalized:.4f})")
 
-    # 4. Theil Index
-    print("  - Tính Theil Index...")
+    print("  - Calculating Theil Index...")
     theil = calculate_theil_index(df_clean, col)
     results["theil"] = theil
     print(f"    Theil: {theil:.4f}")
 
-    # 5. Zipf Coefficient
-    print("  - Tính Zipf Coefficient...")
+    print("  - Calculating Zipf Coefficient...")
     zipf = calculate_zipf_coefficient(df_clean, col)
     results["zipf"] = zipf
     print(f"    Zipf: {zipf:.4f}")
 
-    # 6. Palma Ratio
-    print("  - Tính Palma Ratio...")
+    print("  - Calculating Palma Ratio...")
     palma = calculate_palma_ratio(df_clean, col)
     results["palma"] = palma
     if palma != float("inf"):
@@ -154,14 +136,12 @@ def analyze_csv_file(
     else:
         print(f"    Palma: inf")
 
-    # 7. Shannon Index
-    print("  - Tính Shannon Index...")
+    print("  - Calculating Shannon Index...")
     shannon = calculate_shannon_index(df_clean, col)
     results["shannon"] = shannon
     print(f"    Shannon: {shannon:.4f}")
 
-    # 8. Gamma-Delta (một số giá trị gamma)
-    print("  - Tính Gamma-Delta...")
+    print("  - Calculating Gamma-Delta...")
     gamma_values = [10, 25, 50, 75, 90]
     gamma_delta_results = {}
     for gamma in gamma_values:
@@ -173,9 +153,8 @@ def analyze_csv_file(
             print(f"    Gamma {gamma}%: inf")
     results["gamma_delta"] = gamma_delta_results
 
-    # 9. Shapley Gini (tùy chọn, tính toán chậm)
     if calculate_shapley:
-        print("  - Tính Shapley Gini (có thể mất vài phút)...")
+        print("  - Calculating Shapley Gini (may take a few minutes)...")
         try:
             shapley_liveness, shapley_safety, shapley_correlation = (
                 calculate_shapley_gini(df_clean, col, num_samples=shapley_samples)
@@ -187,7 +166,7 @@ def analyze_csv_file(
             print(f"    Shapley Gini Safety: {shapley_safety:.4f}")
             print(f"    Shapley Gini Correlation: {shapley_correlation:.4f}")
         except Exception as e:
-            print(f"    ⚠ Lỗi khi tính Shapley Gini: {e}")
+            print(f"    ⚠ Error calculating Shapley Gini: {e}")
             results["shapley_gini_liveness"] = None
             results["shapley_gini_safety"] = None
             results["shapley_gini_correlation"] = None
@@ -196,7 +175,6 @@ def analyze_csv_file(
         results["shapley_gini_safety"] = None
         results["shapley_gini_correlation"] = None
 
-    # Thêm thông tin về dữ liệu
     results["data_info"] = {
         "file_path": csv_path,
         "total_validators": len(df),
@@ -208,29 +186,23 @@ def analyze_csv_file(
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     }
 
-    # Xác định thư mục output
     if output_dir is None:
-        # Mặc định lưu vào folder results trong analysis_chains
         script_dir = os.path.dirname(os.path.abspath(__file__))
         output_dir = os.path.join(script_dir, "..", "results")
         output_dir = os.path.abspath(output_dir)
 
     os.makedirs(output_dir, exist_ok=True)
 
-    # Tạo tên file output
     base_name = os.path.splitext(os.path.basename(csv_path))[0]
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-    # Lưu kết quả vào CSV
     csv_output_path = os.path.join(output_dir, f"{base_name}_metrics_{timestamp}.csv")
 
-    # Chuẩn bị dữ liệu cho CSV
     csv_data = {
         "Metric": [],
         "Value": [],
     }
 
-    # Thêm các chỉ số chính
     csv_data["Metric"].extend(
         [
             "Gini Coefficient",
@@ -264,13 +236,11 @@ def analyze_csv_file(
         ]
     )
 
-    # Thêm Gamma-Delta
     for gamma, delta in gamma_delta_results.items():
         gamma_num = gamma.replace("gamma_", "")
         csv_data["Metric"].append(f"Gamma-Delta (gamma={gamma_num}%)")
         csv_data["Value"].append(f"{delta:.6f}" if delta != float("inf") else "inf")
 
-    # Thêm Shapley Gini nếu có
     if results["shapley_gini_liveness"] is not None:
         csv_data["Metric"].extend(
             [
@@ -287,7 +257,6 @@ def analyze_csv_file(
             ]
         )
 
-    # Thêm thông tin về dữ liệu
     csv_data["Metric"].extend(
         [
             "Total Validators",
@@ -309,14 +278,12 @@ def analyze_csv_file(
         ]
     )
 
-    # Lưu vào CSV
     df_output = pd.DataFrame(csv_data)
     df_output.to_csv(csv_output_path, index=False, encoding="utf-8")
-    print(f"\n✓ Đã lưu kết quả vào: {csv_output_path}")
+    print(f"\n✓ Results saved to: {csv_output_path}")
 
-    # In tóm tắt kết quả
     print(f"\n{'='*70}")
-    print("TÓM TẮT KẾT QUẢ")
+    print("SUMMARY")
     print(f"{'='*70}")
     print(f"Gini Coefficient: {gini:.4f}")
     print(f"Nakamoto Coefficient (50%): {nakamoto}")
@@ -339,54 +306,51 @@ def analyze_csv_file(
         print(f"  Correlation: {results['shapley_gini_correlation']:.4f}")
 
     print(f"\n{'='*70}")
-    print(f"Kết quả đã được lưu trong: {output_dir}")
+    print(f"Results saved in: {output_dir}")
     print(f"  - CSV: {os.path.basename(csv_output_path)}")
 
     return results
 
 
 def main():
-    """Hàm main để chạy phân tích"""
+    """Main function to run analysis"""
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Phân tích các chỉ số decentralization từ file CSV"
+        description="Analyze decentralization metrics from CSV file"
     )
-    parser.add_argument(
-        "csv_file", type=str, help="Đường dẫn đến file CSV cần phân tích"
-    )
+    parser.add_argument("csv_file", type=str, help="Path to CSV file to analyze")
     parser.add_argument(
         "--col",
         type=str,
         default="tokens",
-        help="Tên cột chứa stake values (mặc định: 'tokens')",
+        help="Column name containing stake values (default: 'tokens')",
     )
     parser.add_argument(
         "--output-dir",
         type=str,
         default=None,
-        help="Thư mục để lưu kết quả (mặc định: cùng thư mục với CSV)",
+        help="Directory to save results (default: same directory as CSV)",
     )
     parser.add_argument(
         "--no-shapley",
         action="store_true",
-        help="Bỏ qua tính toán Shapley Gini (tính toán chậm)",
+        help="Skip Shapley Gini calculation (slow computation)",
     )
     parser.add_argument(
         "--shapley-samples",
         type=int,
         default=1000,
-        help="Số samples cho Shapley Gini (mặc định: 1000)",
+        help="Number of samples for Shapley Gini (default: 1000)",
     )
     parser.add_argument(
         "--exclude-unidentified",
         action="store_true",
-        help="Loại bỏ các dòng có address là 'Unidentified'",
+        help="Remove rows with address 'Unidentified'",
     )
 
     args = parser.parse_args()
 
-    # Chạy phân tích
     results = analyze_csv_file(
         csv_path=args.csv_file,
         col=args.col,
@@ -400,24 +364,24 @@ def main():
 
 
 if __name__ == "__main__":
-    # Nếu chạy trực tiếp không có arguments, sử dụng file mặc định
+
     if len(sys.argv) == 1:
-        # Sử dụng file Ethereum mặc định
+
         default_csv = os.path.join(
             os.path.dirname(__file__), "..", "data", "19122025_ethereum.csv"
         )
         if os.path.exists(default_csv):
-            print(f"Sử dụng file mặc định: {default_csv}")
+            print(f"Using default file: {default_csv}")
             results = analyze_csv_file(
                 csv_path=default_csv,
                 col="tokens",
-                calculate_shapley=False,  # Tính Shapley Gini (có thể mất vài phút)
-                exclude_unidentified=True,  # Mặc định không loại bỏ Unidentified
+                calculate_shapley=False,
+                exclude_unidentified=True,
             )
         else:
-            print("Vui lòng cung cấp đường dẫn đến file CSV:")
+            print("Please provide path to CSV file:")
             print("  python analyze_csv.py <path_to_csv> [--col <column_name>]")
-            print("\nHoặc sử dụng:")
+            print("\nOr use:")
             print("  python analyze_csv.py data/04122025_ethereum.csv")
     else:
         main()

@@ -90,7 +90,6 @@ def run_desw_experiment(starting_gini=0.3, n_epochs=20000, pmin=0.1, pmax=0.6):
         stakes.copy(), corrupted.copy(), params, compute_shapley=False
     )
 
-    # Chỉ lấy các chỉ số cuối cùng để tiết kiệm thời gian (không ghi CSV, không vẽ đồ thị)
     final_gini = gini_history[-1]
     final_nakamoto = nakamoto_history[-1]
     final_nakamoto_liveness = nakamoto_liveness_history[-1]
@@ -110,8 +109,6 @@ def run_desw_experiment(starting_gini=0.3, n_epochs=20000, pmin=0.1, pmax=0.6):
 if __name__ == "__main__":
     cfg = get_experiment_config()
 
-    # get_experiment_config() trả về tuple (starting_gini, n_epochs)
-    # Nếu sau này đổi thành dict, vẫn hỗ trợ get().
     if isinstance(cfg, tuple):
         starting_gini, n_epochs = cfg
         pmin = 0.1

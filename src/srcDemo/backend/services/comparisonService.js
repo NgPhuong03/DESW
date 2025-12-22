@@ -99,26 +99,22 @@ async function createAndStartComparison({
             [...initialCorrupted],
             { ...base_parameters, proof_of_stake: algorithm },
             async (progressData) => {
-              // progressData là object { epoch, progress, is_full_update, ... }
               const currentProgress =
                 typeof progressData === "number"
                   ? progressData
                   : Number(progressData?.progress ?? 0);
 
-              // Giảm tải: chỉ ghi DB khi là full update (mỗi ~100 epochs)
               if (
                 progressData &&
                 typeof progressData === "object" &&
                 progressData.is_full_update
               ) {
                 try {
-                  // Cập nhật progress cho từng simulation
                   await Simulation.updateOne(
                     { _id: simulation._id },
                     { progress: currentProgress }
                   ).exec();
 
-                  // Tính tổng progress cho toàn bộ comparison
                   const algorithmProgress =
                     currentProgress / algorithms_to_compare.length;
                   const totalProgress = overallProgress + algorithmProgress;

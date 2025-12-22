@@ -496,24 +496,15 @@ class SimulationEngine extends EventEmitter {
       return Math.floor(Math.random() * stakes.length);
     }
 
-    // --- Dynamic Exponential Stake Weighting (DESW) ---
-    // 1. Tính Gini trên phân phối stake hiện tại
     const giniStake = this.gini(stakes);
-
-    // 2. p_dynamic = 1 - Gini, nhưng bị chặn trong [pmin, pmax]
-    //    (tương đương logic trong hàm Python desw_consensus)
     const pDynamic = Math.max(this.pmin, Math.min(this.pmax, 1 - giniStake));
-
-    // 3. Tính power-law weights: stake^p_dynamic
     const powerWeights = stakes.map((stake) => Math.pow(stake, pDynamic));
 
-    // 4. Nếu tất cả weight đều 0 (edge case), fallback random
     const totalWeight = powerWeights.reduce((sum, w) => sum + w, 0);
     if (totalWeight === 0) {
       return Math.floor(Math.random() * stakes.length);
     }
 
-    // 5. Chọn validator theo phân phối powerWeights (giống Python)
     return this.weightedConsensus(powerWeights);
   }
 

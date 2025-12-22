@@ -1,7 +1,7 @@
 /**
  * Real Data Analysis Service
  *
- * Phân tích dữ liệu blockchain thực với các thuật toán:
+ * Analyze real blockchain data with algorithms:
  * - Baseline (WEIGHTED)
  * - SRSW (Square Root Stake Weighting)
  * - LSW (Log Stake Weighting)
@@ -23,7 +23,7 @@ class RealDataAnalysisService {
   }
 
   /**
-   * Tính Gini coefficient
+   * Calculate Gini coefficient
    */
   calculateGini(stakes) {
     if (!stakes || stakes.length === 0) return 0.0;
@@ -61,10 +61,10 @@ class RealDataAnalysisService {
   }
 
   /**
-   * Tính Nakamoto coefficient
-   * Chuẩn: threshold = 0.5 (50%)
-   * - Cho 50%: sử dụng > (strictly greater than) - giống Python
-   * - Cho 33% và 66%: sử dụng >= (greater than or equal) - giống Python
+   * Calculate Nakamoto coefficient
+   * Standard: threshold = 0.5 (50%)
+   * - For 50%: use > (strictly greater than) - matches Python
+   * - For 33% and 66%: use >= (greater than or equal) - matches Python
    */
   calculateNakamoto(stakes, threshold = 0.5) {
     if (!stakes || stakes.length === 0) return 0;
@@ -79,14 +79,11 @@ class RealDataAnalysisService {
     let cumulativeSum = 0;
     for (let i = 0; i < sorted.length; i++) {
       cumulativeSum += sorted[i];
-      // Cho 50%: > (strictly greater than)
-      // Cho 33% và 66%: >= (greater than or equal) - giống Python
       if (threshold === 0.5) {
         if (cumulativeSum > targetAmount) {
           return i + 1;
         }
       } else {
-        // Liveness (33%) và Safety (66%) sử dụng >=
         if (cumulativeSum >= targetAmount) {
           return i + 1;
         }
@@ -97,7 +94,7 @@ class RealDataAnalysisService {
   }
 
   /**
-   * Tính HHI (Herfindahl-Hirschman Index)
+   * Calculate HHI (Herfindahl-Hirschman Index)
    */
   calculateHHI(stakes) {
     if (!stakes || stakes.length === 0) return 0;
@@ -112,23 +109,23 @@ class RealDataAnalysisService {
   }
 
   /**
-   * Tính Nakamoto liveness (33% threshold)
-   * Trả về số validator cần để đạt 33% tổng stake
+   * Calculate Nakamoto liveness (33% threshold)
+   * Returns number of validators needed to reach 33% of total stake
    */
   calculateNakamotoLiveness(stakes) {
     return this.calculateNakamoto(stakes, 0.33);
   }
 
   /**
-   * Tính Nakamoto safety (66% threshold)
-   * Trả về số validator cần để đạt 66% tổng stake
+   * Calculate Nakamoto safety (66% threshold)
+   * Returns number of validators needed to reach 66% of total stake
    */
   calculateNakamotoSafety(stakes) {
     return this.calculateNakamoto(stakes, 0.66);
   }
 
   /**
-   * Tính Zipf coefficient (negative slope of log-log rank vs stake)
+   * Calculate Zipf coefficient (negative slope of log-log rank vs stake)
    */
   calculateZipf(stakes) {
     if (!stakes || stakes.length === 0) return 0;
@@ -197,14 +194,13 @@ class RealDataAnalysisService {
   }
 
   /**
-   * Phân tích một blockchain với tất cả algorithms
+   * Analyze a blockchain with all algorithms
    */
   analyzeBlockchain(validatorData) {
     if (!validatorData || !Array.isArray(validatorData.validators)) {
       throw new Error("Invalid validator data format");
     }
 
-    // Filter out validators with stake <= 0 để tránh lỗi trong các phép tính (sqrt, log, pow)
     const validValidators = validatorData.validators.filter(
       (v) => v.tokens != null && typeof v.tokens === "number" && v.tokens > 0
     );
@@ -232,20 +228,14 @@ class RealDataAnalysisService {
 
         results[name.toLowerCase()] = {
           algorithm: algorithm,
-          // Gini
           gini_coefficient: this.calculateGini(transformedStakes),
-          // Nakamoto (50%) - chuẩn: strictly greater than 50%
           nakamoto_coefficient: this.calculateNakamoto(transformedStakes, 0.5),
-          // Nakamoto Liveness (33%) và Safety (66%)
           nakamoto_liveness: livenessCount,
           nakamoto_liveness_pct: Number(livenessPct.toFixed(2)),
           nakamoto_safety: safetyCount,
           nakamoto_safety_pct: Number(safetyPct.toFixed(2)),
-          // HHI
           hhi_coefficient: this.calculateHHI(transformedStakes),
-          // Zipf
           zipf_coefficient: this.calculateZipf(transformedStakes),
-          // Others
           total_validators: transformedStakes.length,
           total_stake: transformedStakes.reduce((sum, s) => sum + s, 0),
         };
@@ -267,27 +257,26 @@ class RealDataAnalysisService {
       }
     }
 
-    // Tính toán số lượng validator và stake hợp lệ (sau khi filter stake <= 0)
-    const totalValidators = validValidators.length; // Số validator hợp lệ đã được phân tích
+    const totalValidators = validValidators.length;
     const totalStake = stakes.reduce((sum, s) => sum + s, 0);
-    const originalTotalValidators = validatorData.validators.length; // Tổng số validator gốc
-    const filteredOutCount = originalTotalValidators - totalValidators; // Số validator bị loại bỏ
+    const originalTotalValidators = validatorData.validators.length;
+    const filteredOutCount = originalTotalValidators - totalValidators;
 
     return {
       blockchain: validatorData.blockchain,
       timestamp: validatorData.timestamp,
       original_data: {
-        total_validators: totalValidators, // Số validator hợp lệ (stake > 0) đã được phân tích
-        total_stake: totalStake, // Tổng stake của các validator hợp lệ
-        original_total_validators: originalTotalValidators, // Tổng số validator gốc (trước filter)
-        filtered_out_validators: filteredOutCount, // Số validator bị loại bỏ (stake <= 0)
+        total_validators: totalValidators,
+        total_stake: totalStake,
+        original_total_validators: originalTotalValidators,
+        filtered_out_validators: filteredOutCount,
       },
       analysis_results: results,
     };
   }
 
   /**
-   * Phân tích nhiều blockchains
+   * Analyze multiple blockchains
    */
   analyzeMultipleChains(chainsData) {
     const results = {};
@@ -332,7 +321,7 @@ class RealDataAnalysisService {
   }
 
   /**
-   * Tạo comparison matrix cho visualization
+   * Generate comparison matrix for visualization
    */
   generateComparisonMatrix(analysisResults) {
     const matrix = {

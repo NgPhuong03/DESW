@@ -1,7 +1,7 @@
 /**
  * Real Data Analysis Routes
  *
- * API endpoints cho thu thập và phân tích dữ liệu blockchain thực
+ * API endpoints for collecting and analyzing real blockchain data
  */
 
 const express = require("express");
