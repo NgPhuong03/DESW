@@ -8,6 +8,7 @@ node_modules/
 
 # Data files (CSV files có thể lớn, không cần commit)
 data/
+scripts/
 
 # Logs
 logs/

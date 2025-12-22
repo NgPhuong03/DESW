@@ -6,10 +6,7 @@ const Simulation = require("../models/Simulation");
 const Comparison = require("../models/Comparison");
 
 async function run() {
-  // Kết nối tới đúng database PoS (giống như trong MongoDB Compass)
-  const uri =
-    // process.env.MONGODB_URI ||
-    "mongodb+srv://mluan:042408Luan@demo.oqubfud.mongodb.net/PoS";
+  const uri = process.env.MONGODB_URI;
 
   console.log("Connecting to MongoDB (PoS db)...");
   await mongoose.connect(uri, {});
