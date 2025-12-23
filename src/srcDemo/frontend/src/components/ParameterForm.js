@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Info, AlertCircle, CheckCircle } from "lucide-react";
 import { simulationAPI } from "../services/api";
 import toast from "react-hot-toast";
+import Tooltip from "./Tooltip";
 
 const ParameterForm = ({
   onSubmit,
@@ -37,6 +38,40 @@ const ParameterForm = ({
 
   const [validation, setValidation] = useState({ valid: true, errors: [] });
   const [isValidating, setIsValidating] = useState(false);
+
+  // Parameter descriptions for tooltips
+  const parameterDescriptions = {
+    n_epochs:
+      "Number of epochs (cycles) in the simulation. Each epoch represents one validator selection round. Higher values provide more stable results but take longer.",
+    proof_of_stake:
+      "PoS stake-weighting algorithm to use:\n• WEIGHTED: Standard stake-weighted selection\n• DESW: Dynamic exponential weighting based on Gini\n• SRSW: Square root of stake weighting\n• LSW: Logarithmic stake weighting\n• OPPOSITE_WEIGHTED: Inverse weighting\n• RANDOM: Random selection",
+    initial_stake_volume:
+      "Total initial stake distributed to all validators. This value determines the overall scale of the system. Stake is distributed according to initial distribution.",
+    initial_distribution:
+      "Method for distributing initial stake:\n• UNIFORM: Even distribution to all validators\n• GINI: Distribution based on Gini coefficient (inequality)\n• RANDOM: Random distribution",
+    initial_gini:
+      "Initial Gini coefficient (0-1). Value 0 = perfectly equal distribution, 1 = completely unequal. Only applies when Initial distribution = GINI.",
+    n_peers:
+      "Initial number of validators in the network. Higher values simulate larger networks but run slower.",
+    n_corrupted:
+      "Number of corrupted validators (malicious actors). These validators may fail or attack the network. Must be less than or equal to total validators.",
+    p_fail:
+      "Probability that a corrupted validator will fail in each epoch (0-1). Higher values = more failures. Affects network reliability.",
+    p_join:
+      "Probability that a new validator joins the network in each epoch (0-1). Higher values = more new validators joining. Recommended: 0.001-0.1.",
+    p_leave:
+      "Probability that a validator leaves the network in each epoch (0-1). Higher values = more validators leaving. Recommended: 0.001-0.1.",
+    join_amount:
+      "Method to determine stake for new validators when joining:\n• NEW_MAX: Equal to current maximum stake\n• NEW_MIN: Equal to current minimum stake\n• NEW_AVERAGE: Equal to current average stake\n• NEW_RANDOM: Random stake amount",
+    penalty_percentage:
+      "Penalty rate when a corrupted validator fails (0-1). Higher values = heavier penalties. Penalty is deducted from validator's stake.",
+    reward:
+      "Base reward that a validator receives when selected in an epoch. This value can be adjusted by dynamic reward.",
+    use_dynamic_reward:
+      "Enable/disable dynamic rewards. When enabled, rewards change based on factors like stake distribution and performance. Helps balance the system better.",
+    scheduled_joins:
+      "Schedule new validators to join at specific epochs. Allows precise control over when and with how much stake new validators join.",
+  };
 
   // Algorithm options
   const algorithmOptions = [
@@ -220,8 +255,9 @@ const ParameterForm = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="form-group">
                 <label className="form-label">
-                  Epochs
-                  <Info className="inline w-4 h-4 ml-1 text-gray-400" />
+                  <Tooltip content={parameterDescriptions.n_epochs}>
+                    Epochs
+                  </Tooltip>
                 </label>
                 <input
                   type="number"
@@ -239,7 +275,9 @@ const ParameterForm = ({
               {showModelSelect && (
                 <div className="form-group">
                   <label className="form-label">
-                    PoS stake-weighting model
+                    <Tooltip content={parameterDescriptions.proof_of_stake}>
+                      PoS stake-weighting model
+                    </Tooltip>
                   </label>
                   <select
                     className="form-select"
@@ -259,7 +297,11 @@ const ParameterForm = ({
               )}
 
               <div className="form-group">
-                <label className="form-label">Total initial stake</label>
+                <label className="form-label">
+                  <Tooltip content={parameterDescriptions.initial_stake_volume}>
+                    Total initial stake
+                  </Tooltip>
+                </label>
                 <input
                   type="number"
                   className="form-input"
@@ -277,7 +319,11 @@ const ParameterForm = ({
               </div>
 
               <div className="form-group">
-                <label className="form-label">Initial distribution</label>
+                <label className="form-label">
+                  <Tooltip content={parameterDescriptions.initial_distribution}>
+                    Initial distribution
+                  </Tooltip>
+                </label>
                 <select
                   className="form-select"
                   value={parameters.initial_distribution}
@@ -296,7 +342,11 @@ const ParameterForm = ({
 
               {parameters.initial_distribution === "GINI" && (
                 <div className="form-group">
-                  <label className="form-label">Initial Gini</label>
+                  <label className="form-label">
+                    <Tooltip content={parameterDescriptions.initial_gini}>
+                      Initial Gini
+                    </Tooltip>
+                  </label>
                   <input
                     type="number"
                     className="form-input"
@@ -313,7 +363,11 @@ const ParameterForm = ({
               )}
 
               <div className="form-group">
-                <label className="form-label">Validators</label>
+                <label className="form-label">
+                  <Tooltip content={parameterDescriptions.n_peers}>
+                    Validators
+                  </Tooltip>
+                </label>
                 <input
                   type="number"
                   className="form-input"
@@ -340,7 +394,11 @@ const ParameterForm = ({
           <div className="card-body">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="form-group">
-                <label className="form-label">Corrupted validators</label>
+                <label className="form-label">
+                  <Tooltip content={parameterDescriptions.n_corrupted}>
+                    Corrupted validators
+                  </Tooltip>
+                </label>
                 <input
                   type="number"
                   className="form-input"
@@ -356,7 +414,9 @@ const ParameterForm = ({
 
               <div className="form-group">
                 <label className="form-label">
-                  Failure probability (p_fail)
+                  <Tooltip content={parameterDescriptions.p_fail}>
+                    Failure probability (p_fail)
+                  </Tooltip>
                 </label>
                 <input
                   type="number"
@@ -373,7 +433,11 @@ const ParameterForm = ({
               </div>
 
               <div className="form-group">
-                <label className="form-label">Join probability (p_join)</label>
+                <label className="form-label">
+                  <Tooltip content={parameterDescriptions.p_join}>
+                    Join probability (p_join)
+                  </Tooltip>
+                </label>
                 <input
                   type="number"
                   className="form-input"
@@ -390,7 +454,9 @@ const ParameterForm = ({
 
               <div className="form-group">
                 <label className="form-label">
-                  Leave probability (p_leave)
+                  <Tooltip content={parameterDescriptions.p_leave}>
+                    Leave probability (p_leave)
+                  </Tooltip>
                 </label>
                 <input
                   type="number"
@@ -407,7 +473,11 @@ const ParameterForm = ({
               </div>
 
               <div className="form-group">
-                <label className="form-label">Join stake type</label>
+                <label className="form-label">
+                  <Tooltip content={parameterDescriptions.join_amount}>
+                    Join stake type
+                  </Tooltip>
+                </label>
                 <select
                   className="form-select"
                   value={parameters.join_amount}
@@ -423,7 +493,11 @@ const ParameterForm = ({
               </div>
 
               <div className="form-group">
-                <label className="form-label">Penalty rate</label>
+                <label className="form-label">
+                  <Tooltip content={parameterDescriptions.penalty_percentage}>
+                    Penalty rate
+                  </Tooltip>
+                </label>
                 <input
                   type="number"
                   className="form-input"
@@ -457,7 +531,11 @@ const ParameterForm = ({
           <div className="card-body flex-1">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="form-group">
-                <label className="form-label">Base reward</label>
+                <label className="form-label">
+                  <Tooltip content={parameterDescriptions.reward}>
+                    Base reward
+                  </Tooltip>
+                </label>
                 <input
                   type="number"
                   className="form-input"
@@ -482,7 +560,9 @@ const ParameterForm = ({
                     }
                     disabled={disabled}
                   />
-                  Use dynamic reward
+                  <Tooltip content={parameterDescriptions.use_dynamic_reward}>
+                    Use dynamic reward
+                  </Tooltip>
                 </label>
               </div>
             </div>
@@ -493,7 +573,9 @@ const ParameterForm = ({
         <div className="card flex flex-col">
           <div className="card-header">
             <h3 className="text-lg font-medium text-gray-900">
-              Scheduled joins
+              <Tooltip content={parameterDescriptions.scheduled_joins}>
+                Scheduled joins
+              </Tooltip>
             </h3>
             <p className="text-sm text-gray-600 mt-1">
               Schedule new validators to join at specific epochs
@@ -503,7 +585,11 @@ const ParameterForm = ({
             {/* Add new scheduled join */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div className="form-group">
-                <label className="form-label">Epoch</label>
+                <label className="form-label">
+                  <Tooltip content="Epoch at which the new validator will join the network. Must be a non-negative integer and less than the total number of epochs in the simulation.">
+                    Epoch
+                  </Tooltip>
+                </label>
                 <input
                   type="number"
                   className="form-input"
@@ -511,14 +597,18 @@ const ParameterForm = ({
                   onChange={(e) =>
                     setNewJoin((prev) => ({ ...prev, epoch: e.target.value }))
                   }
-                  placeholder="Epoch tham gia"
+                  placeholder="Epoch joins"
                   min="0"
                   disabled={disabled}
                 />
               </div>
 
               <div className="form-group">
-                <label className="form-label">Stake</label>
+                <label className="form-label">
+                  <Tooltip content="Amount of stake the new validator will have when joining at the specified epoch. Must be a positive number.">
+                    Stake
+                  </Tooltip>
+                </label>
                 <input
                   type="number"
                   className="form-input"

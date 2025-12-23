@@ -4,6 +4,8 @@ This repository contains the **research implementation** used in our research pa
 
 The codebase includes a comprehensive PoS (Proof-of-Stake) simulation framework, real-world blockchain analysis tools, and a web-based analyzer application. This setup enables reproducibility of our experimental results and facilitates further research in PoS consensus mechanism optimization and decentralization analysis.
 
+[Watch the demo video of PoS-Analyzer](https://youtu.be/L_LxJao--fQ) in action to see how the tool visualizes decentralization metrics (Gini coefficient, Nakamoto coefficient, HHI, Zipf), compares different PoS stake-weighting algorithms, and analyzes real-world blockchain validator data.
+
 ## 🔬 Key Research Contributions
 
 **DESW (Dynamic Exponential Stake Weighting)**: A novel PoS consensus algorithm that dynamically adjusts validator selection probabilities based on stake distribution, aiming to improve decentralization metrics while maintaining network security and efficiency.
