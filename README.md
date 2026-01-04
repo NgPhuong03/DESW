@@ -1,6 +1,6 @@
 # DESW
 
-This repository contains the **research implementation** used in our research paper: **""**.
+This repository contains the **research implementation** used in our research paper: **"Toward Fairer Consensus: Dynamic Stake Compression for Decentralized Proof-of-Stake Blockchains"**.
 
 The codebase includes a comprehensive PoS (Proof-of-Stake) simulation framework, real-world blockchain analysis tools, and a web-based analyzer application. This setup enables reproducibility of our experimental results and facilitates further research in PoS consensus mechanism optimization and decentralization analysis.
 
