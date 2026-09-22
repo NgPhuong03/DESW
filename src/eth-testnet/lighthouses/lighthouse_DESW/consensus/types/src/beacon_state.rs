@@ -49,6 +49,12 @@ mod tests;
 pub const CACHED_EPOCHS: usize = 3;
 const MAX_RANDOM_BYTE: u64 = (1 << 8) - 1;
 const MAX_RANDOM_VALUE: u64 = (1 << 16) - 1;
+const DESW_MIN_EXPONENT: f64 = 0.1;
+const DESW_MAX_EXPONENT: f64 = 0.6;
+
+fn compute_desw_exponent(gini: f64) -> f64 {
+    (1.0 - gini).clamp(DESW_MIN_EXPONENT, DESW_MAX_EXPONENT)
+}
 
 pub type Validators<E> = List<Validator, <E as EthSpec>::ValidatorRegistryLimit>;
 pub type Balances<E> = List<u64, <E as EthSpec>::ValidatorRegistryLimit>;
@@ -1044,12 +1050,14 @@ impl<E: EthSpec> BeaconState<E> {
         }
     }
 
-    fn compute_stake_power(&self, effective_balance: u64, indices: &[usize], gini: f64) -> Result<f64, Error> {
-        let pmin: f64 = 0.0;
-        let pmax: f64 = 1.0;
-        let one: f64 = 1.0;
-        let power: f64 = pmin.min(pmax.max(one - gini));
-        
+    fn compute_stake_power(
+        &self,
+        effective_balance: u64,
+        indices: &[usize],
+        gini: f64,
+    ) -> Result<f64, Error> {
+        let power = compute_desw_exponent(gini);
+
         let mut eb = (effective_balance as f64).powf(power);
 
         let mut balances: Vec<u64> = Vec::new();
