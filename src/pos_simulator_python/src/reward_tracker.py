@@ -52,8 +52,8 @@ except ImportError:
     )
 
 # Initialize pmin and pmax for DESW
-pmin = 0
-pmax = 1
+pmin = 0.1
+pmax = 0.6
 
 
 def simulate_with_reward_tracking(

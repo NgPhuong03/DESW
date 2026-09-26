@@ -18,7 +18,7 @@ class RealDataAnalysisService {
     };
 
     // DESW parameters (matching analysis_chains)
-    this.pmin = 0.0;
+    this.pmin = 0.1;
     this.pmax = 0.6;
   }
 

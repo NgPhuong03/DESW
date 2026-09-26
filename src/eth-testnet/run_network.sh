@@ -54,13 +54,14 @@ fi
 
 cd "${ROOT_DIR}"
 
+# Keep the Kurtosis package format compatible with the custom Lighthouse images.
+ETHEREUM_PACKAGE_VERSION="6.0.0"
+
 echo "Using params file: ${PARAMS_FILE}"
 echo "Starting kurtosis network with enclave '${ENCLAVE_NAME}'..."
-kurtosis run github.com/ethpandaops/ethereum-package \
+kurtosis run "github.com/ethpandaops/ethereum-package@${ETHEREUM_PACKAGE_VERSION}" \
   --args-file "${PARAMS_FILE}" \
   --image-download always \
   --enclave "${ENCLAVE_NAME}"
 
 echo "Kurtosis run completed."
-
-

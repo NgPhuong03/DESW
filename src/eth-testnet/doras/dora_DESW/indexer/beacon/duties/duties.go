@@ -446,7 +446,7 @@ func computeGiniCoefficientDirect(balances []uint64) float64 {
 	}
 
 	n := float64(len(balances))
-	
+
 	// Calculate mean
 	var sum uint64
 	for _, balance := range balances {
@@ -461,19 +461,14 @@ func computeGiniCoefficientDirect(balances []uint64) float64 {
 			giniSum += math.Abs(float64(balances[i]) - float64(balances[j]))
 		}
 	}
-	
+
 	return giniSum / (2 * n * n * mean)
 }
 
 // computeStakePower calculates the stake power for a validator based on their effective balance and the Gini coefficient.
 // This implements the stake power calculation from the Electra fork specification.
 func computeStakePower(effectiveBalance uint64, indices []ActiveIndiceIndex, gini float64, state *BeaconState) (float64, error) {
-	const pmin = 0.0
-	const pmax = 1.0
-	const one = 1.0
-
-	// Calculate power based on Gini coefficient
-	power := math.Min(pmin, math.Max(pmax, one-gini))
+	power := computeDESWPower(gini)
 
 	// Calculate effective balance raised to the power
 	eb := math.Pow(float64(effectiveBalance), power)
@@ -501,6 +496,10 @@ func computeStakePower(effectiveBalance uint64, indices []ActiveIndiceIndex, gin
 	return eb, nil
 }
 
+func computeDESWPower(gini float64) float64 {
+	return math.Max(0.1, math.Min(0.6, 1.0-gini))
+}
+
 // shufflingRandomValue calculates the random value for shuffling based on the iteration index and seed.
 func shufflingRandomValue(i uint64, seed [32]byte) (uint64, error) {
 	// For Electra fork, use 16-bit random values
@@ -515,4 +514,3 @@ func shufflingRandomByte(i uint64, seed [32]byte) byte {
 	b := append(seed[:], UintToBytes(i/32)...)
 	return Hash(b)[i%32]
 }
-

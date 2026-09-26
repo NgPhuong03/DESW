@@ -53,16 +53,14 @@ except ImportError:
         shapley_gini,
     )
 
-pmin = 0
-pmax = 1
-
-
 def simulate_with_detailed_tracking(
     stakes: List[float],
     corrupted: List[int],
     params: Parameters,
     compute_shapley: bool = False,
     shapley_samples: int = 10000,
+    pmin: float = 0.1,
+    pmax: float = 0.6,
 ) -> Tuple[
     List[float],
     List[int],

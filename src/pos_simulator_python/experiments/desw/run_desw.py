@@ -68,7 +68,7 @@ def run_desw_experiment(starting_gini=0.3, n_epochs=20000, pmin=0.1, pmax=0.6):
         f"Initial Gini: {gini(stakes):.3f}, Peers: {len(stakes)}, Epochs: {params.n_epochs}"
     )
 
-    # Run simulation with detailed tracking (pmin/pmax are module-level in simulator)
+    # Run simulation with the DESW bounds selected for this experiment.
     (
         gini_history,
         peers_history,
@@ -87,7 +87,12 @@ def run_desw_experiment(starting_gini=0.3, n_epochs=20000, pmin=0.1, pmax=0.6):
         _,
         _,
     ) = simulate_with_detailed_tracking(
-        stakes.copy(), corrupted.copy(), params, compute_shapley=False
+        stakes.copy(),
+        corrupted.copy(),
+        params,
+        compute_shapley=False,
+        pmin=pmin,
+        pmax=pmax,
     )
 
     final_gini = gini_history[-1]

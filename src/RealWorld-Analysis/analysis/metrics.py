@@ -45,7 +45,7 @@ class BlockchainDecentralizationMetrics:
 
         results = []
 
-        pmin = 0.0
+        pmin = 0.1
         pmax = 0.6
 
         for blockchain in BlockchainDecentralizationMetrics.BLOCKCHAIN_LIST:

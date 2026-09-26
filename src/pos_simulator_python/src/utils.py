@@ -853,7 +853,7 @@ def gini_stabilized_consensus(peers: List[float], t: float) -> int:
     return len(peers) - 1
 
 
-def desw_consensus(peers: List[float], pmin: float = 0, pmax: float = 1) -> int:
+def desw_consensus(peers: List[float], pmin: float = 0.1, pmax: float = 0.6) -> int:
     """
     Determine DESW (Dynamic Exponential Stake Weighting) consensus among peer group.
     Weight combines Power-Law (stake^p, where p = 1 - Gini) to create dynamic balance.
@@ -878,7 +878,7 @@ def desw_consensus(peers: List[float], pmin: float = 0, pmax: float = 1) -> int:
     # Calculate Gini coefficient using existing function
     gini_stake = gini(peers)
 
-    # Calculate dynamic p: p = 1 - Gini, bounded in [0.2, 0.8]
+    # Calculate dynamic p: p = 1 - Gini, bounded in [0.1, 0.6]
     p_dynamic = max(pmin, min(pmax, 1 - gini_stake))
 
     # Calculate Power-Law weights
@@ -1091,7 +1091,11 @@ def generate_peers(
 
 
 def consensus(
-    pos: PoS, stakes: List[float], t: float = -1.0, pmin: float = 0, pmax: float = 1
+    pos: PoS,
+    stakes: List[float],
+    t: float = -1.0,
+    pmin: float = 0.1,
+    pmax: float = 0.6,
 ) -> int:
     """
     Execute consensus algorithm based on PoS type
