@@ -341,6 +341,25 @@ mod committees {
 }
 
 #[test]
+fn desw_exponent_matches_paper_bounds() {
+    let cases = [
+        (0.0, 0.6),
+        (0.2, 0.6),
+        (0.5, 0.5),
+        (0.8, 0.2),
+        (1.0, 0.1),
+    ];
+
+    for (gini, expected) in cases {
+        let actual = super::compute_desw_exponent(gini);
+        assert!(
+            (actual - expected).abs() < f64::EPSILON,
+            "Gini {gini}: expected exponent {expected}, got {actual}"
+        );
+    }
+}
+
+#[test]
 fn decode_base_and_altair() {
     type E = MainnetEthSpec;
     let spec = E::default_spec();

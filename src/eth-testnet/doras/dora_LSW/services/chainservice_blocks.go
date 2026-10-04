@@ -340,6 +340,7 @@ func (bs *ChainService) GetDbBlocksForSlots(firstSlot uint64, slotLimit uint32, 
 	getCanonicalProposer := func(slot phase0.Slot) phase0.ValidatorIndex {
 		epoch := chainState.EpochOfSlot(slot)
 		if epoch != proposerAssignmentsEpoch {
+			proposerAssignments = nil
 			if epochStats := bs.beaconIndexer.GetEpochStats(epoch, nil); epochStats != nil {
 				if epochStatsValues := epochStats.GetValues(true); epochStatsValues != nil {
 					proposerAssignments = map[phase0.Slot]phase0.ValidatorIndex{}
@@ -386,19 +387,11 @@ func (bs *ChainService) GetDbBlocksForSlots(firstSlot uint64, slotLimit uint32, 
 				canonicalProposer := getCanonicalProposer(slot)
 
 				if len(blocks) > 0 {
-					if proposerAssignments == nil {
-						hasCanonicalProposer = true
-					} else {
-						for _, block := range blocks {
-							header := block.GetHeader()
-							if header == nil {
-								continue
-							}
-
-							if header.Message.ProposerIndex == canonicalProposer {
-								hasCanonicalProposer = true
-								break
-							}
+					// Block ancestry is authoritative; missing duties must not hide a canonical block.
+					for _, block := range blocks {
+						if block.GetHeader() != nil && bs.beaconIndexer.IsCanonicalBlockByHead(block, lastCanonicalBlock) {
+							hasCanonicalProposer = true
+							break
 						}
 					}
 				}
@@ -466,19 +459,11 @@ func (bs *ChainService) GetDbBlocksForSlots(firstSlot uint64, slotLimit uint32, 
 				canonicalProposer := getCanonicalProposer(slot)
 
 				if len(blocks) > 0 {
-					if proposerAssignments == nil {
-						hasCanonicalProposer = true
-					} else {
-						for _, block := range blocks {
-							header := block.GetHeader()
-							if header == nil {
-								continue
-							}
-
-							if header.Message.ProposerIndex == canonicalProposer {
-								hasCanonicalProposer = true
-								break
-							}
+					// Block ancestry is authoritative; missing duties must not hide a canonical block.
+					for _, block := range blocks {
+						if block.GetHeader() != nil && bs.beaconIndexer.IsCanonicalBlockByHead(block, lastCanonicalBlock) {
+							hasCanonicalProposer = true
+							break
 						}
 					}
 				}
@@ -586,6 +571,7 @@ func (bs *ChainService) GetDbBlocksByFilter(filter *dbtypes.BlockFilter, pageIdx
 	getCanonicalProposer := func(slot phase0.Slot) phase0.ValidatorIndex {
 		epoch := chainState.EpochOfSlot(slot)
 		if epoch != proposerAssignmentsEpoch {
+			proposerAssignments = nil
 			if epochStats := bs.beaconIndexer.GetEpochStats(epoch, nil); epochStats != nil {
 				if epochStatsValues := epochStats.GetValues(true); epochStatsValues != nil {
 					proposerAssignments = map[phase0.Slot]phase0.ValidatorIndex{}
@@ -799,19 +785,11 @@ func (bs *ChainService) GetDbBlocksByFilter(filter *dbtypes.BlockFilter, pageIdx
 
 			// check if canonical proposer has proposed a block
 			if len(blocks) > 0 {
-				if proposerAssignments == nil {
-					hasCanonicalProposer = true
-				} else {
-					for _, block := range blocks {
-						header := block.GetHeader()
-						if header == nil {
-							continue
-						}
-
-						if header.Message.ProposerIndex == canonicalProposer {
-							hasCanonicalProposer = true
-							break
-						}
+				// Block ancestry is authoritative; missing duties must not hide a canonical block.
+				for _, block := range blocks {
+					if block.GetHeader() != nil && bs.beaconIndexer.IsCanonicalBlockByHead(block, lastCanonicalBlock) {
+						hasCanonicalProposer = true
+						break
 					}
 				}
 			}

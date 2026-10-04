@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"sort"
 
 	"github.com/attestantio/go-eth2-client/spec/phase0"
 	"github.com/ethpandaops/dora/clients/consensus"
@@ -221,7 +222,12 @@ func GetProposerIndex(spec *consensus.ChainSpec, state *BeaconState, slot phase0
 			}
 
 			// Use stake power comparison instead of direct effective balance comparison
-			if stakePower*float64(maxRandomValue) >= maxStakePower*float64(randomValue) {
+			// Match Lighthouse's floating-point tolerance in both fork branches.
+			const epsilon = 1e-12
+			lhs := stakePower * float64(maxRandomValue)
+			rhs := maxStakePower * float64(randomValue)
+			threshold := rhs - epsilon*math.Max(math.Abs(rhs), 1.0)
+			if lhs >= threshold {
 				return ActiveIndiceIndex(candidateIndex), nil
 			}
 		}
@@ -438,37 +444,50 @@ func trapz(y []float64, dx float64) float64 {
 	return area
 }
 
-// computeGiniCoefficientDirect calculates Gini coefficient using the direct formula
-// This is more accurate for equal values
+// computeGiniCoefficientDirect computes the Lorenz area in the same order as Lighthouse.
+// The origin and wide integer sums keep equal balances and large totals correct.
 func computeGiniCoefficientDirect(balances []uint64) float64 {
 	if len(balances) <= 1 {
-		return 0.0
+		return 0
+	}
+	ordered := append([]uint64(nil), balances...)
+	sort.Slice(ordered, func(i, j int) bool { return ordered[i] < ordered[j] })
+	total := new(big.Int)
+	for _, balance := range ordered {
+		total.Add(total, new(big.Int).SetUint64(balance))
+
+	}
+	if total.Sign() == 0 {
+		return 0
 	}
 
-	n := float64(len(balances))
-
-	// Calculate mean
-	var sum uint64
-	for _, balance := range balances {
-		sum += balance
+	totalFloat, _ := new(big.Float).SetInt(total).Float64()
+	cumulative := new(big.Int)
+	previous := 0.0 // Include the Lorenz origin (0, 0), as in Lighthouse.
+	area := 0.0
+	dx := 1.0 / float64(len(ordered))
+	for _, balance := range ordered {
+		cumulative.Add(cumulative, new(big.Int).SetUint64(balance))
+		cumulativeFloat, _ := new(big.Float).SetInt(cumulative).Float64()
+		current := cumulativeFloat / totalFloat
+		area += 0.5 * (previous + current) * dx
+		previous = current
 	}
-	mean := float64(sum) / n
+	return math.Max(0, math.Min(1, 1-2*area))
 
-	// Calculate Gini coefficient using the direct formula
-	var giniSum float64
-	for i := 0; i < len(balances); i++ {
-		for j := 0; j < len(balances); j++ {
-			giniSum += math.Abs(float64(balances[i]) - float64(balances[j]))
-		}
-	}
-
-	return giniSum / (2 * n * n * mean)
 }
 
 // computeStakePower calculates the stake power for a validator based on their effective balance and the Gini coefficient.
 // This implements the stake power calculation from the Electra fork specification.
 func computeStakePower(effectiveBalance uint64, indices []ActiveIndiceIndex, gini float64, state *BeaconState) (float64, error) {
-	power := computeDESWPower(gini)
+
+	const pmin = 0.1
+	const pmax = 0.6
+	const one = 1.0
+
+	// Calculate power based on Gini coefficient
+	power := math.Max(pmin, math.Min(pmax, one-gini))
+
 
 	// Calculate effective balance raised to the power
 	eb := math.Pow(float64(effectiveBalance), power)

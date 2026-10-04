@@ -49,6 +49,38 @@ mod tests;
 pub const CACHED_EPOCHS: usize = 3;
 const MAX_RANDOM_BYTE: u64 = (1 << 8) - 1;
 const MAX_RANDOM_VALUE: u64 = (1 << 16) - 1;
+
+const DESW_MIN_EXPONENT: f64 = 0.1;
+const DESW_MAX_EXPONENT: f64 = 0.6;
+
+// Keep the arithmetic order identical to Dora's Lorenz-area implementation.
+fn compute_desw_gini(balances: &[u64]) -> f64 {
+    if balances.len() <= 1 {
+        return 0.0;
+    }
+    let mut ordered = balances.to_vec();
+    ordered.sort_unstable();
+    let total: u128 = ordered.iter().fold(0u128, |sum, b| sum.saturating_add(*b as u128));
+    if total == 0 {
+        return 0.0;
+    }
+    let total_f64 = total as f64;
+    let dx = 1.0 / ordered.len() as f64;
+    let mut cumulative = 0u128;
+    let mut previous = 0.0; // The Lorenz curve starts at (0, 0).
+    let mut area = 0.0;
+    for balance in ordered {
+        cumulative = cumulative.saturating_add(balance as u128);
+        let current = cumulative as f64 / total_f64;
+        area += 0.5 * (previous + current) * dx;
+        previous = current;
+    }
+    (1.0 - 2.0 * area).clamp(0.0, 1.0)
+}
+
+fn compute_desw_exponent(gini: f64) -> f64 {
+    (1.0 - gini).clamp(DESW_MIN_EXPONENT, DESW_MAX_EXPONENT)
+=======
 const DESW_MIN_POWER: f64 = 0.1;
 const DESW_MAX_POWER: f64 = 0.6;
 
@@ -58,6 +90,7 @@ fn desw_power(gini: f64) -> f64 {
 
 fn desw_stake_weight(effective_balance: u64, power: f64) -> f64 {
     (effective_balance as f64).powf(power)
+
 }
 
 pub type Validators<E> = List<Validator, <E as EthSpec>::ValidatorRegistryLimit>;
@@ -1060,8 +1093,10 @@ impl<E: EthSpec> BeaconState<E> {
         indices: &[usize],
         gini: f64,
     ) -> Result<f64, Error> {
-        let power = desw_power(gini);
-        let mut eb = desw_stake_weight(effective_balance, power);
+        let power = compute_desw_exponent(gini);
+
+        let mut eb = (effective_balance as f64).powf(power);
+
 
         let mut balances: Vec<u64> = Vec::new();
         for &i in indices {
@@ -1095,46 +1130,7 @@ impl<E: EthSpec> BeaconState<E> {
             balances.push(self.get_effective_balance(i)?);
         }
 
-        // Sort balances in ascending order for Lorenz curve calculation
-        balances.sort_unstable();
-
-        // Sum with u128 to reduce overflow/precision issues prior to conversion.
-        let total_weight_u128: u128 = balances
-            .iter()
-            .fold(0u128, |acc, b| acc.saturating_add(*b as u128));
-        if total_weight_u128 == 0 {
-            return Ok(0.0);
-        }
-        let total_weight_f64 = total_weight_u128 as f64;
-
-        // Calculate cumulative weights for Lorenz curve
-        let mut cum_weights = Vec::with_capacity(balances.len());
-        let mut cumulative_u128: u128 = 0;
-        for balance in &balances {
-            cumulative_u128 = cumulative_u128.saturating_add(*balance as u128);
-            cum_weights.push((cumulative_u128 as f64) / total_weight_f64);
-        }
-
-        // Calculate area under Lorenz curve using trapezoidal rule
-        let dx = 1.0 / balances.len() as f64;
-        let area_under_lorenz = Self::trapz(&cum_weights, dx);
-
-        // Gini coefficient = 1 - 2 * area_under_lorenz_curve
-        let gini_coefficient = 1.0 - 2.0 * area_under_lorenz;
-        Ok(gini_coefficient)
-    }
-
-    /// Computes the area under a curve using the trapezoidal rule.
-    fn trapz(y: &[f64], dx: f64) -> f64 {
-        if y.len() < 2 {
-            return 0.0;
-        }   
-        
-        let mut area = 0.0;
-        for i in 0..y.len() - 1 {
-            area += 0.5 * (y[i] + y[i + 1]) * dx;
-        }
-        area
+        Ok(compute_desw_gini(&balances))
     }
 
     /// Fork-aware abstraction for the shuffling.
@@ -2961,5 +2957,76 @@ impl<'de, E: EthSpec> ContextDeserialize<'de, ForkName> for BeaconState<E> {
             Self,
             serde::Deserialize::deserialize(deserializer)?
         ))
+    }
+}
+
+#[cfg(test)]
+mod desw_weighting_regression_tests {
+    use super::{compute_desw_exponent, compute_desw_gini};
+
+    #[test]
+    fn gini_includes_lorenz_origin() {
+        for balances in [vec![], vec![0], vec![0, 0], vec![36, 36], vec![36; 384]] {
+            assert!(compute_desw_gini(&balances).abs() < 1e-12);
+        }
+        assert!((compute_desw_gini(&[1, 2, 3]) - 2.0 / 9.0).abs() < 1e-12);
+        assert!((compute_desw_gini(&[0, 0, 100]) - 2.0 / 3.0).abs() < 1e-12);
+        assert!(compute_desw_gini(&[u64::MAX, u64::MAX]).abs() < 1e-12);
+    }
+
+    #[test]
+    fn exponent_matches_dora_bounds() {
+        for (gini, expected) in [(0.0, 0.6), (0.5, 0.5), (0.95, 0.1), (1.0, 0.1)] {
+            assert!((compute_desw_exponent(gini) - expected).abs() < 1e-12);
+        }
+    }
+}
+
+#[cfg(test)]
+mod proposer_reference_regression_tests {
+    use super::*;
+
+    #[derive(serde::Deserialize)]
+    struct Case {
+        electra: bool,
+        balances: Vec<u64>,
+        seed: String,
+        expected: usize,
+    }
+
+    #[test]
+    fn weighted_proposer_matches_dora_vectors() {
+        let cases: Vec<Case> = serde_json::from_str(include_str!("proposer_vectors.json")).unwrap();
+        let mut spec = MinimalEthSpec::default_spec();
+        spec.shuffle_round_count = 90;
+        spec.max_effective_balance = 32_000_000_000;
+        spec.max_effective_balance_electra = 2_048_000_000_000;
+        let electra_template: BeaconStateElectra<MinimalEthSpec> = crate::test_utils::test_random_instance();
+        for case in cases {
+            let mut state = if case.electra {
+                let mut state = electra_template.clone();
+                state.validators = Validators::default();
+                state.balances = Balances::default();
+                BeaconState::Electra(state)
+            } else {
+                BeaconState::<MinimalEthSpec>::new(0, Eth1Data::default(), &spec)
+            };
+            for balance in case.balances {
+                state.validators_mut().push(Validator {
+                    pubkey: PublicKeyBytes::empty(),
+                    withdrawal_credentials: Hash256::zero(),
+                    effective_balance: balance,
+                    slashed: false,
+                    activation_eligibility_epoch: Epoch::new(0),
+                    activation_epoch: Epoch::new(0),
+                    exit_epoch: spec.far_future_epoch,
+                    withdrawable_epoch: spec.far_future_epoch,
+                }).unwrap();
+                state.balances_mut().push(balance).unwrap();
+            }
+            let indices: Vec<usize> = (0..state.validators().len()).collect();
+            let seed = hex::decode(case.seed).unwrap();
+            assert_eq!(state.compute_proposer_index(&indices, &seed, &spec).unwrap(), case.expected);
+        }
     }
 }
