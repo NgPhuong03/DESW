@@ -80,7 +80,7 @@ fn compute_desw_gini(balances: &[u64]) -> f64 {
 
 fn compute_desw_exponent(gini: f64) -> f64 {
     (1.0 - gini).clamp(DESW_MIN_EXPONENT, DESW_MAX_EXPONENT)
-=======
+}
 const DESW_MIN_POWER: f64 = 0.1;
 const DESW_MAX_POWER: f64 = 0.6;
 
