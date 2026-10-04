@@ -2829,3 +2829,52 @@ impl<'de, E: EthSpec> ContextDeserialize<'de, ForkName> for BeaconState<E> {
         ))
     }
 }
+
+#[cfg(test)]
+mod proposer_reference_regression_tests {
+    use super::*;
+
+    #[derive(serde::Deserialize)]
+    struct Case {
+        electra: bool,
+        balances: Vec<u64>,
+        seed: String,
+        expected: usize,
+    }
+
+    #[test]
+    fn weighted_proposer_matches_dora_vectors() {
+        let cases: Vec<Case> = serde_json::from_str(include_str!("proposer_vectors.json")).unwrap();
+        let mut spec = MinimalEthSpec::default_spec();
+        spec.shuffle_round_count = 90;
+        spec.max_effective_balance = 32_000_000_000;
+        spec.max_effective_balance_electra = 2_048_000_000_000;
+        let electra_template: BeaconStateElectra<MinimalEthSpec> = crate::test_utils::test_random_instance();
+        for case in cases {
+            let mut state = if case.electra {
+                let mut state = electra_template.clone();
+                state.validators = Validators::default();
+                state.balances = Balances::default();
+                BeaconState::Electra(state)
+            } else {
+                BeaconState::<MinimalEthSpec>::new(0, Eth1Data::default(), &spec)
+            };
+            for balance in case.balances {
+                state.validators_mut().push(Validator {
+                    pubkey: PublicKeyBytes::empty(),
+                    withdrawal_credentials: Hash256::zero(),
+                    effective_balance: balance,
+                    slashed: false,
+                    activation_eligibility_epoch: Epoch::new(0),
+                    activation_epoch: Epoch::new(0),
+                    exit_epoch: spec.far_future_epoch,
+                    withdrawable_epoch: spec.far_future_epoch,
+                }).unwrap();
+                state.balances_mut().push(balance).unwrap();
+            }
+            let indices: Vec<usize> = (0..state.validators().len()).collect();
+            let seed = hex::decode(case.seed).unwrap();
+            assert_eq!(state.compute_proposer_index(&indices, &seed, &spec).unwrap(), case.expected);
+        }
+    }
+}
