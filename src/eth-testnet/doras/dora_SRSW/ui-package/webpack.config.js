@@ -44,9 +44,9 @@ var webpackBaseConfig = {
               "@babel/preset-react"
             ],
             plugins: [
-              "@babel/syntax-dynamic-import",
-              "@babel/proposal-class-properties",
-              "@babel/proposal-object-rest-spread",
+              "@babel/plugin-syntax-dynamic-import",
+              "@babel/plugin-proposal-class-properties",
+              "@babel/plugin-proposal-object-rest-spread",
               "@babel/plugin-syntax-flow"
             ]
           },

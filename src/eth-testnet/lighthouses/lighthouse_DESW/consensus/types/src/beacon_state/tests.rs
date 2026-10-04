@@ -1,4 +1,5 @@
 #![cfg(test)]
+use super::{desw_power, desw_stake_weight, DESW_MAX_POWER, DESW_MIN_POWER};
 use crate::test_utils::*;
 use beacon_chain::test_utils::{BeaconChainHarness, EphemeralHarnessType};
 use beacon_chain::types::{
@@ -109,6 +110,38 @@ async fn test_beacon_proposer_index<E: EthSpec>() {
 #[tokio::test]
 async fn beacon_proposer_index() {
     test_beacon_proposer_index::<MinimalEthSpec>().await;
+}
+
+#[test]
+fn desw_power_matches_paper() {
+    for (gini, expected) in [
+        (0.0, 0.6),
+        (0.2, 0.6),
+        (0.5, 0.5),
+        (0.9, 0.1),
+        (1.0, 0.1),
+    ] {
+        assert!((desw_power(gini) - expected).abs() < f64::EPSILON);
+    }
+}
+
+#[test]
+fn desw_power_is_bounded_and_non_increasing() {
+    let powers = (0..=100)
+        .map(|step| desw_power(step as f64 / 100.0))
+        .collect::<Vec<_>>();
+
+    assert!(powers
+        .iter()
+        .all(|power| (DESW_MIN_POWER..=DESW_MAX_POWER).contains(power)));
+    assert!(powers.windows(2).all(|pair| pair[1] <= pair[0]));
+}
+
+#[test]
+fn desw_positive_power_preserves_stake_ordering() {
+    for power in [DESW_MIN_POWER, 0.5, DESW_MAX_POWER] {
+        assert!(desw_stake_weight(64, power) > desw_stake_weight(32, power));
+    }
 }
 
 /// Test that

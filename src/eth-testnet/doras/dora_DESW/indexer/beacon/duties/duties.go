@@ -455,10 +455,12 @@ func computeGiniCoefficientDirect(balances []uint64) float64 {
 	total := new(big.Int)
 	for _, balance := range ordered {
 		total.Add(total, new(big.Int).SetUint64(balance))
+
 	}
 	if total.Sign() == 0 {
 		return 0
 	}
+
 	totalFloat, _ := new(big.Float).SetInt(total).Float64()
 	cumulative := new(big.Int)
 	previous := 0.0 // Include the Lorenz origin (0, 0), as in Lighthouse.
@@ -472,17 +474,20 @@ func computeGiniCoefficientDirect(balances []uint64) float64 {
 		previous = current
 	}
 	return math.Max(0, math.Min(1, 1-2*area))
+
 }
 
 // computeStakePower calculates the stake power for a validator based on their effective balance and the Gini coefficient.
 // This implements the stake power calculation from the Electra fork specification.
 func computeStakePower(effectiveBalance uint64, indices []ActiveIndiceIndex, gini float64, state *BeaconState) (float64, error) {
+
 	const pmin = 0.1
 	const pmax = 0.6
 	const one = 1.0
 
 	// Calculate power based on Gini coefficient
 	power := math.Max(pmin, math.Min(pmax, one-gini))
+
 
 	// Calculate effective balance raised to the power
 	eb := math.Pow(float64(effectiveBalance), power)
@@ -508,6 +513,10 @@ func computeStakePower(effectiveBalance uint64, indices []ActiveIndiceIndex, gin
 	// Normalize by total weight raised to the power
 	eb = eb / math.Pow(totalWeightF64, power)
 	return eb, nil
+}
+
+func computeDESWPower(gini float64) float64 {
+	return math.Max(0.1, math.Min(0.6, 1.0-gini))
 }
 
 // shufflingRandomValue calculates the random value for shuffling based on the iteration index and seed.
