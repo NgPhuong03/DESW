@@ -1,0 +1,22 @@
+{
+  "model": "DESW",
+  "workload": "transfer",
+  "samples": 60000,
+  "successful_tps": 190.47,
+  "total_rps": 0.0,
+  "errors": 0,
+  "test_duration_s": 315.01,
+  "rate_limit": 200.0,
+  "latency_ms": {
+    "mean": 0.85,
+    "median": 0.79,
+    "min": 0.43,
+    "max": 52.38,
+    "stddev": 0.54
+  },
+  "timeline": {
+    "started_at": "2026-10-12T01:33:57+07:00",
+    "load_stopped_at": "2026-10-12T01:38:57+07:00",
+    "finished_at": "2026-10-12T01:39:12+07:00"
+  }
+}

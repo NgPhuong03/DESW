@@ -1,0 +1,22 @@
+{
+  "model": "DESW",
+  "workload": "deploy",
+  "samples": 60000,
+  "successful_tps": 126.27,
+  "total_rps": 0.0,
+  "errors": 0,
+  "test_duration_s": 475.18,
+  "rate_limit": 200.0,
+  "latency_ms": {
+    "mean": 3.35,
+    "median": 3.05,
+    "min": 2.11,
+    "max": 151.39,
+    "stddev": 2.86
+  },
+  "timeline": {
+    "started_at": "2026-10-12T01:39:13+07:00",
+    "load_stopped_at": "2026-10-12T01:44:13+07:00",
+    "finished_at": "2026-10-12T01:47:08+07:00"
+  }
+}

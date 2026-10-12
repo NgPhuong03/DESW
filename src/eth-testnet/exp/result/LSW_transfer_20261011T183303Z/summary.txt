@@ -1,0 +1,22 @@
+============================================================
+BENCHMARK SUMMARY: LSW / transfer
+============================================================
+Total Samples:       60,000 requests
+Successful TPS:      190.47 tx/s
+Total RPS:           0.00 req/s
+Total Errors:        0
+Test Duration:       315.01 s
+Target Rate Limit:   200 req/s
+
+--- Latency (Execution) ---
+Mean Latency:        0.88 ms
+Median Latency:      0.82 ms
+Min Latency:         0.43 ms
+Max Latency:         52.57 ms
+StdDev:              0.54 ms
+
+--- Timeline ---
+Started At:          2026-10-12T01:33:03+07:00
+Load Stopped At:     2026-10-12T01:38:03+07:00
+Finished At:         2026-10-12T01:38:18+07:00
+============================================================

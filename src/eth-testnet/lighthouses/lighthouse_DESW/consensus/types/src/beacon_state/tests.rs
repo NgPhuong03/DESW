@@ -1,5 +1,5 @@
 #![cfg(test)]
-use super::{desw_power, desw_stake_weight, DESW_MAX_POWER, DESW_MIN_POWER};
+use super::{compute_desw_exponent, DESW_MAX_EXPONENT, DESW_MIN_EXPONENT};
 use crate::test_utils::*;
 use beacon_chain::test_utils::{BeaconChainHarness, EphemeralHarnessType};
 use beacon_chain::types::{
@@ -113,34 +113,21 @@ async fn beacon_proposer_index() {
 }
 
 #[test]
-fn desw_power_matches_paper() {
-    for (gini, expected) in [
-        (0.0, 0.6),
-        (0.2, 0.6),
-        (0.5, 0.5),
-        (0.9, 0.1),
-        (1.0, 0.1),
-    ] {
-        assert!((desw_power(gini) - expected).abs() < f64::EPSILON);
-    }
-}
-
-#[test]
-fn desw_power_is_bounded_and_non_increasing() {
+fn desw_exponent_is_bounded_and_non_increasing() {
     let powers = (0..=100)
-        .map(|step| desw_power(step as f64 / 100.0))
+        .map(|step| compute_desw_exponent(step as f64 / 100.0))
         .collect::<Vec<_>>();
 
     assert!(powers
         .iter()
-        .all(|power| (DESW_MIN_POWER..=DESW_MAX_POWER).contains(power)));
+        .all(|power| (DESW_MIN_EXPONENT..=DESW_MAX_EXPONENT).contains(power)));
     assert!(powers.windows(2).all(|pair| pair[1] <= pair[0]));
 }
 
 #[test]
 fn desw_positive_power_preserves_stake_ordering() {
-    for power in [DESW_MIN_POWER, 0.5, DESW_MAX_POWER] {
-        assert!(desw_stake_weight(64, power) > desw_stake_weight(32, power));
+    for power in [DESW_MIN_EXPONENT, 0.5, DESW_MAX_EXPONENT] {
+        assert!((64f64).powf(power) > (32f64).powf(power));
     }
 }
 

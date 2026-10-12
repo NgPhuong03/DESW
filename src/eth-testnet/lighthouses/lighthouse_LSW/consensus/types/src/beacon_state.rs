@@ -2853,8 +2853,8 @@ mod proposer_reference_regression_tests {
         for case in cases {
             let mut state = if case.electra {
                 let mut state = electra_template.clone();
-                state.validators = Validators::default();
-                state.balances = Balances::default();
+                state.validators = Default::default();
+                state.balances = Default::default();
                 BeaconState::Electra(state)
             } else {
                 BeaconState::<MinimalEthSpec>::new(0, Eth1Data::default(), &spec)

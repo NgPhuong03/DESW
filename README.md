@@ -306,6 +306,37 @@ This will:
 - Configure network parameters from `params/` directory
 - Display network status and endpoints
 
+#### Performance & Load Testing (polycli & k6)
+
+Benchmark transaction throughput (TPS) and block finality latency across testnet variants using `polycli` and `k6` located in `src/eth-testnet/exp`:
+
+1. **Configure Networks**:
+   ```bash
+   cd src/eth-testnet/exp
+   cp networks.env.example networks.env
+   # Fill in RPC_URL and PRIVATE_KEY for each network (DF, SRSW, LSW, DESW)
+   ```
+
+2. **Wait for Network Stabilization**:
+   > **Important**: After starting the testnets, allow **10–15 minutes (approx. 2–3 epochs)** for the networks to stabilize before initiating benchmarks. Ensure genesis has passed, validators have established peer connections, and the chain has reached its first finalized checkpoints. You can verify network status with:
+   ```bash
+   python3 check_status.py
+   ```
+
+3. **Run Benchmarks**:
+   ```bash
+   # Run all workloads for a single model (DF, SRSW, LSW, or DESW)
+   ./run_one.sh DESW
+
+   # Or run all workloads across all networks sequentially
+   ./run_all.sh
+
+   # Or run a specific workload (transfer, deploy, or finality)
+   ./run_one.sh DESW transfer
+   ```
+
+See [`src/eth-testnet/exp/README.md`](src/eth-testnet/exp/README.md) for full prerequisites and setup details.
+
 #### Cleaning Up
 
 Remove all Docker containers and images:
@@ -313,6 +344,7 @@ Remove all Docker containers and images:
 ```bash
 ./cleanup_images.sh
 ```
+
 
 <a id="configuration"></a>
 
@@ -410,9 +442,12 @@ DESW/
 │       ├── lighthouses/           # Lighthouse client variants
 │       ├── doras/                 # Dora explorer variants
 │       ├── params/                # Testnet configuration files
+│       ├── exp/                   # Performance & load testing suite (polycli & k6)
 │       ├── build_lighthouses.sh   # Build Docker images for Lighthouse consensus clients
 │       ├── build_doras.sh         # Build Docker images for Dora blockchain explorers
-│       └── run_network.sh         # Network orchestration script
+│       ├── cleanup_images.sh      # Clean up testnet Docker containers and images
+│       ├── run_network.sh         # Network orchestration script
+│       └── topup_stake.sh         # Validator stake top-up utility
 ├── README.md                      # Main documentation
 └── .gitignore                     # Git ignore patterns
 ```

@@ -1,0 +1,22 @@
+{
+  "model": "LSW",
+  "workload": "deploy",
+  "samples": 60000,
+  "successful_tps": 126.26,
+  "total_rps": 0.0,
+  "errors": 0,
+  "test_duration_s": 475.22,
+  "rate_limit": 200.0,
+  "latency_ms": {
+    "mean": 3.35,
+    "median": 3.02,
+    "min": 2.11,
+    "max": 196.95,
+    "stddev": 3.6
+  },
+  "timeline": {
+    "started_at": "2026-10-12T01:38:19+07:00",
+    "load_stopped_at": "2026-10-12T01:43:19+07:00",
+    "finished_at": "2026-10-12T01:46:14+07:00"
+  }
+}

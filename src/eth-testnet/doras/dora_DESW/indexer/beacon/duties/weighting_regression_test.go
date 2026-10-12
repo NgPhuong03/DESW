@@ -38,12 +38,13 @@ func TestWeightedProposerReferenceVectors(t *testing.T) {
 			zero := uint64(0)
 			electraEpoch = &zero
 		}
-		spec := &consensus.ChainSpec{
-			SlotsPerEpoch: 32, ShuffleRoundCount: 90,
-			DomainBeaconProposer: phase0.DomainType{0, 0, 0, 0},
-			MaxEffectiveBalance:  32000000000, MaxEffectiveBalanceElectra: 2048000000000,
-			ElectraForkEpoch: electraEpoch,
-		}
+		spec := &consensus.ChainSpec{}
+		spec.SlotsPerEpoch = 32
+		spec.ShuffleRoundCount = 90
+		spec.DomainBeaconProposer = phase0.DomainType{0, 0, 0, 0}
+		spec.MaxEffectiveBalance = 32000000000
+		spec.MaxEffectiveBalanceElectra = 2048000000000
+		spec.ElectraForkEpoch = electraEpoch
 		state := &BeaconState{
 			RandaoMix:           &mix,
 			GetActiveCount:      func() uint64 { return uint64(len(c.Balances)) },

@@ -1,0 +1,22 @@
+============================================================
+BENCHMARK SUMMARY: DF / deploy
+============================================================
+Total Samples:       60,000 requests
+Successful TPS:      126.26 tx/s
+Total RPS:           0.00 req/s
+Total Errors:        0
+Test Duration:       475.19 s
+Target Rate Limit:   200 req/s
+
+--- Latency (Execution) ---
+Mean Latency:        3.26 ms
+Median Latency:      2.97 ms
+Min Latency:         2.07 ms
+Max Latency:         145.65 ms
+StdDev:              2.50 ms
+
+--- Timeline ---
+Started At:          2026-10-12T01:42:46+07:00
+Load Stopped At:     2026-10-12T01:47:46+07:00
+Finished At:         2026-10-12T01:50:41+07:00
+============================================================

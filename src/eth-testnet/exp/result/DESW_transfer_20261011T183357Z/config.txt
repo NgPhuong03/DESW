@@ -1,0 +1,9 @@
+model=DESW
+workload=transfer
+rpc_url=http://127.0.0.1:33332
+legacy=true
+requests=2000
+rate_limit=200
+concurrency=30
+mode=t
+gas_price_wei=1000000000
