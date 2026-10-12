@@ -1,0 +1,22 @@
+{
+  "model": "SRSW",
+  "workload": "transfer",
+  "samples": 60000,
+  "successful_tps": 190.47,
+  "total_rps": 0.0,
+  "errors": 0,
+  "test_duration_s": 315.01,
+  "rate_limit": 200.0,
+  "latency_ms": {
+    "mean": 0.77,
+    "median": 0.71,
+    "min": 0.43,
+    "max": 15.51,
+    "stddev": 0.31
+  },
+  "timeline": {
+    "started_at": "2026-10-12T01:38:19+07:00",
+    "load_stopped_at": "2026-10-12T01:43:19+07:00",
+    "finished_at": "2026-10-12T01:43:34+07:00"
+  }
+}

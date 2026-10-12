@@ -1,5 +1,7 @@
 *./.env
 *.env
+.env.*
 node_modules/
 *.log
 package-lock.json
+.venv/

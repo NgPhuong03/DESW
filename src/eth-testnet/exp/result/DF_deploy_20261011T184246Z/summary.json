@@ -1,0 +1,22 @@
+{
+  "model": "DF",
+  "workload": "deploy",
+  "samples": 60000,
+  "successful_tps": 126.26,
+  "total_rps": 0.0,
+  "errors": 0,
+  "test_duration_s": 475.19,
+  "rate_limit": 200.0,
+  "latency_ms": {
+    "mean": 3.26,
+    "median": 2.97,
+    "min": 2.07,
+    "max": 145.65,
+    "stddev": 2.5
+  },
+  "timeline": {
+    "started_at": "2026-10-12T01:42:46+07:00",
+    "load_stopped_at": "2026-10-12T01:47:46+07:00",
+    "finished_at": "2026-10-12T01:50:41+07:00"
+  }
+}

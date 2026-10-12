@@ -1,0 +1,22 @@
+============================================================
+BENCHMARK SUMMARY: DESW / deploy
+============================================================
+Total Samples:       60,000 requests
+Successful TPS:      126.27 tx/s
+Total RPS:           0.00 req/s
+Total Errors:        0
+Test Duration:       475.18 s
+Target Rate Limit:   200 req/s
+
+--- Latency (Execution) ---
+Mean Latency:        3.35 ms
+Median Latency:      3.05 ms
+Min Latency:         2.11 ms
+Max Latency:         151.39 ms
+StdDev:              2.86 ms
+
+--- Timeline ---
+Started At:          2026-10-12T01:39:13+07:00
+Load Stopped At:     2026-10-12T01:44:13+07:00
+Finished At:         2026-10-12T01:47:08+07:00
+============================================================

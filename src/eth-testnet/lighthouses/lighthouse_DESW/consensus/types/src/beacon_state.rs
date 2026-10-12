@@ -81,17 +81,6 @@ fn compute_desw_gini(balances: &[u64]) -> f64 {
 fn compute_desw_exponent(gini: f64) -> f64 {
     (1.0 - gini).clamp(DESW_MIN_EXPONENT, DESW_MAX_EXPONENT)
 }
-const DESW_MIN_POWER: f64 = 0.1;
-const DESW_MAX_POWER: f64 = 0.6;
-
-fn desw_power(gini: f64) -> f64 {
-    (1.0 - gini).clamp(DESW_MIN_POWER, DESW_MAX_POWER)
-}
-
-fn desw_stake_weight(effective_balance: u64, power: f64) -> f64 {
-    (effective_balance as f64).powf(power)
-
-}
 
 pub type Validators<E> = List<Validator, <E as EthSpec>::ValidatorRegistryLimit>;
 pub type Balances<E> = List<u64, <E as EthSpec>::ValidatorRegistryLimit>;
@@ -3005,8 +2994,8 @@ mod proposer_reference_regression_tests {
         for case in cases {
             let mut state = if case.electra {
                 let mut state = electra_template.clone();
-                state.validators = Validators::default();
-                state.balances = Balances::default();
+                state.validators = Default::default();
+                state.balances = Default::default();
                 BeaconState::Electra(state)
             } else {
                 BeaconState::<MinimalEthSpec>::new(0, Eth1Data::default(), &spec)

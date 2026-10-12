@@ -1,0 +1,1 @@
+Polygon CLI Version v0.1.78-10-g58d9b39

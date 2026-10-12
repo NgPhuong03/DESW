@@ -1,0 +1,22 @@
+{
+  "model": "DF",
+  "workload": "transfer",
+  "samples": 60000,
+  "successful_tps": 190.47,
+  "total_rps": 0.0,
+  "errors": 0,
+  "test_duration_s": 315.01,
+  "rate_limit": 200.0,
+  "latency_ms": {
+    "mean": 0.76,
+    "median": 0.7,
+    "min": 0.43,
+    "max": 53.92,
+    "stddev": 0.54
+  },
+  "timeline": {
+    "started_at": "2026-10-12T01:37:30+07:00",
+    "load_stopped_at": "2026-10-12T01:42:30+07:00",
+    "finished_at": "2026-10-12T01:42:45+07:00"
+  }
+}
